@@ -55,7 +55,7 @@ class DashboardController extends Controller
                     $r->clientFName ?? null,
                     $r->clientMName ?? null,
                     $r->clientLName ?? null
-                ) ?: '—';
+                ) ?: ClientNameDisplay::EMPTY_DISPLAY;
                 $r->displayDateCreated = ClientNameDisplay::formatDateCreated($r->dateCreated ?? null);
 
                 return $r;
@@ -102,7 +102,7 @@ class DashboardController extends Controller
                     $r->clientFName ?? null,
                     $r->clientMName ?? null,
                     $r->clientLName ?? null
-                ) ?: '—';
+                ) ?: ClientNameDisplay::EMPTY_DISPLAY;
                 $r->displayDateCreated = ClientNameDisplay::formatDateCreated($r->dateCreated ?? null);
 
                 return $r;
@@ -220,7 +220,7 @@ class DashboardController extends Controller
                 $row->clientFName ?? null,
                 $row->clientMName ?? null,
                 $row->clientLName ?? null
-            ) ?: '—');
+            ) ?: ClientNameDisplay::EMPTY_DISPLAY);
 
         $dateCreated = property_exists($row, 'cert_created_at') && $row->cert_created_at !== null && $row->cert_created_at !== ''
             ? ClientNameDisplay::formatDateTimeCreated($row->cert_created_at)
@@ -234,11 +234,11 @@ class DashboardController extends Controller
             'documentType' => $row->document_type,
             'referenceCode' => $row->referenceCode ?? '',
             'client' => $client,
-            'address' => ($row->address ?? '') !== '' ? ClientNameDisplay::formatAddress((string) $row->address) : '—',
-            'sex' => ($row->sex ?? '') !== '' ? $row->sex : '—',
-            'contactNum' => ($row->contactNum ?? '') !== '' ? $row->contactNum : '—',
-            'paymentStatus' => ($row->paymentStatus ?? '') !== '' ? $row->paymentStatus : '—',
-            'dateCreated' => ($dateCreated !== null && $dateCreated !== '') ? $dateCreated : '—',
+            'address' => ($row->address ?? '') !== '' ? ClientNameDisplay::formatAddress((string) $row->address) : ClientNameDisplay::EMPTY_DISPLAY,
+            'sex' => ($row->sex ?? '') !== '' ? $row->sex : ClientNameDisplay::EMPTY_DISPLAY,
+            'contactNum' => ($row->contactNum ?? '') !== '' ? $row->contactNum : ClientNameDisplay::EMPTY_DISPLAY,
+            'paymentStatus' => ($row->paymentStatus ?? '') !== '' ? $row->paymentStatus : ClientNameDisplay::EMPTY_DISPLAY,
+            'dateCreated' => ($dateCreated !== null && $dateCreated !== '') ? $dateCreated : ClientNameDisplay::EMPTY_DISPLAY,
         ];
     }
 

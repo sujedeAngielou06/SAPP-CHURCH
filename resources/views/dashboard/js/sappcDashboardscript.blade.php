@@ -354,19 +354,23 @@
                     esc(row.referenceCode) +
                     '</td>' +
                     '<td>' +
-                    esc(row.client) +
+                    (typeof window.sappcRegistryCellHtml === 'function' ? window.sappcRegistryCellHtml(row.client) : esc(row.client)) +
                     '</td>' +
                     '<td>' +
-                    esc(typeof sappcFormatAddress === 'function' ? sappcFormatAddress(row.address) : row.address) +
+                    (typeof window.sappcRegistryCellHtml === 'function' ?
+                        window.sappcRegistryCellHtml(row.address, function(v) {
+                            return typeof sappcFormatAddress === 'function' ? sappcFormatAddress(v) : v;
+                        }) :
+                        esc(typeof sappcFormatAddress === 'function' ? sappcFormatAddress(row.address) : row.address)) +
                     '</td>' +
                     '<td>' +
-                    esc(row.contactNum) +
+                    (typeof window.sappcRegistryCellHtml === 'function' ? window.sappcRegistryCellHtml(row.contactNum) : esc(row.contactNum)) +
                     '</td>' +
                     '<td>' +
                     esc(row.documentType) +
                     '</td>' +
                     '<td>' +
-                    esc(row.dateCreated) +
+                    (typeof window.sappcRegistryCellHtml === 'function' ? window.sappcRegistryCellHtml(row.dateCreated) : esc(row.dateCreated)) +
                     '</td>' +
                     '<td class="text-center text-nowrap">' +
                     '<button type="button" class="btn btn-link btn-sm sappc-action-edit p-0 me-2" title="Edit" aria-label="Edit" data-record-id="' +

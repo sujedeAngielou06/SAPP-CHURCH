@@ -541,6 +541,7 @@
 
 #christeningApplicationFormModal #christeningApplicationForm .sappcChOfficialDocTitle {
     font-size: 1.35rem;
+    font-weight: 700 !important;
 }
 
 #christeningApplicationForm {
@@ -632,6 +633,7 @@
 #christeningApplicationForm .sappcChOfficialPage2Title,
 #christeningApplicationForm .sappcChOfficialGpHeading {
     font-size: 21px;
+    font-weight: 700 !important;
 }
 
 #christeningApplicationForm .sappcChOfficialMastheadLine,
@@ -1014,7 +1016,7 @@
 .sappcChOfficialDocTitle {
     margin: 0.55rem 0 0;
     font-size: 1.1rem;
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: 0.08em;
     color: #7a5a12;
 }
@@ -1281,7 +1283,7 @@
 
 .sappcChOfficialSectionTitle {
     font-size: 0.68rem;
-    font-weight: 400;
+    font-weight: 700;
     text-transform: uppercase;
     margin: 0.85rem 0 0.35rem;
     letter-spacing: 0.04em;
@@ -1404,7 +1406,7 @@
     margin: 0 0 0.65rem;
     text-align: center;
     font-size: 0.95rem;
-    font-weight: 400;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
@@ -1452,7 +1454,7 @@
 .sappcChOfficialGpHeading {
     text-align: center;
     font-size: 0.78rem;
-    font-weight: 400;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     margin: 0.75rem 0 0.5rem;

@@ -5,10 +5,6 @@
         body.landing-page {
             background-image: url("{{ asset('assets/landingPage/BACKGROUND.jpg') }}");
         }
-
-        .landing-ribbon {
-            background-image: url("{{ asset('assets/landingPage/RIBBON.png') }}");
-        }
     </style>
 @endpush
 
@@ -18,8 +14,6 @@
 
 @section('content')
     @include('layouts.landingPageHeader')
-
-    <div class="landing-ribbon" aria-hidden="true"></div>
 
     <main class="landing-main">
         <section class="sappc-main" aria-label="Welcome">

@@ -241,16 +241,27 @@
 
                                 <h2 class="sappcChOfficialGpHeading">Listahan kang mga maninoy kag maninay sa pagbunyag
                                 </h2>
-                                <div class="sappcChOfficialGpToolbar">
-                                    <div class="sappcChOfficialGpColHeads" aria-hidden="true">
+                                <div class="sappc-gp-toolbar">
+                                    <div class="sappc-gp-col-heads" aria-hidden="true">
                                         <span>Maninoy</span>
                                         <span>Maninay</span>
                                     </div>
-                                    <button type="button" class="sappcChOfficialGpAddBtn" id="chAppGpAddBtn">Add</button>
+                                    <div class="sappc-gp-toolbar-actions">
+                                        <button type="button" class="sappc-gp-btn sappc-gp-btn--add" id="chAppGpAddBtn"
+                                            aria-label="Add godparent row">
+                                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                                            <span>Add</span>
+                                        </button>
+                                        <button type="button" class="sappc-gp-btn sappc-gp-btn--delete" id="chAppGpDeleteBtn"
+                                            aria-label="Remove last godparent row">
+                                            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                            <span>Delete</span>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="sappcChOfficialGpCols">
-                                    <div class="sappcChOfficialGpCol" id="chAppGpColA"></div>
-                                    <div class="sappcChOfficialGpCol" id="chAppGpColB"></div>
+                                <div class="sappc-gp-cols">
+                                    <div class="sappc-gp-col" id="chAppGpColA"></div>
+                                    <div class="sappc-gp-col" id="chAppGpColB"></div>
                                 </div>
 
                                 <div class="sappcChOfficialApprovalBox">

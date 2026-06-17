@@ -8,6 +8,34 @@
 
         var initialTablePayload = @json($initialTablePayload);
         var activeSection = @json($activeSection);
+        var sappcNoData = window.sappcNoDataProvided || 'No Data Provided';
+
+        function isEmptyDisplayValue(v) {
+            if (typeof window.sappcIsEmptyDisplayValue === 'function') {
+                return window.sappcIsEmptyDisplayValue(v);
+            }
+            var s = String(v == null ? '' : v).trim();
+            return !s || s === '\u2014' || s === '-' || s.toLowerCase() === sappcNoData.toLowerCase();
+        }
+
+        function emptyDisplayHtml() {
+            if (typeof window.sappcEmptyDisplayHtml === 'function') {
+                return window.sappcEmptyDisplayHtml();
+            }
+            return '<span class="sappc-no-data">' + esc(sappcNoData) + '</span>';
+        }
+
+        function registryCellHtml(value, formatter) {
+            if (typeof window.sappcRegistryCellHtml === 'function') {
+                return window.sappcRegistryCellHtml(value, formatter);
+            }
+            var display = (typeof formatter === 'function') ? formatter(value) : value;
+            display = display == null ? '' : String(display).trim();
+            if (isEmptyDisplayValue(display)) {
+                return emptyDisplayHtml();
+            }
+            return esc(display);
+        }
 
         function getSelectedWeddingId() {
             var cid = ($('#wdSelectedWeddingId').val() || '').trim();
@@ -31,6 +59,69 @@
             if ($('#wdScheduleWeddingId').length) {
                 $('#wdScheduleWeddingId').val(id);
             }
+        }
+
+        function registryRowMetaFromTr($tr) {
+            var $tds = $tr.find('td');
+            if ($tds.length < 5) {
+                return null;
+            }
+            var rawContact = ($tds.eq(4).text() || '').trim();
+            return {
+                reference_code: ($tds.eq(1).text() || '').trim(),
+                client: ($tds.eq(2).text() || '').trim(),
+                address: ($tds.eq(3).text() || '').trim(),
+                contact_number: isEmptyDisplayValue(rawContact) ? '' : formatPhMobileDisplay(rawContact),
+            };
+        }
+
+        function applyWeddingRegistryTopFields(meta) {
+            if (!meta || typeof meta !== 'object') {
+                return;
+            }
+            var ref = meta.reference_code != null ? String(meta.reference_code).trim() : '';
+            var client = meta.client != null ? String(meta.client).trim() : '';
+            var address = meta.address != null ? String(meta.address).trim() : '';
+            var contact = meta.contact_number != null ? String(meta.contact_number).trim() : '';
+            if (isEmptyDisplayValue(ref)) ref = '';
+            if (isEmptyDisplayValue(client)) client = '';
+            if (isEmptyDisplayValue(address)) address = '';
+            if (isEmptyDisplayValue(contact)) contact = '';
+            if (address && typeof sappcFormatAddress === 'function') {
+                address = sappcFormatAddress(address);
+            }
+            if ($('#wdPaymentRefCode').length) {
+                if (ref) {
+                    $('#wdPaymentRefCode').val(ref);
+                }
+                $('#wdPaymentClient').val(client);
+                $('#wdPaymentAddress').val(address);
+                $('#wdPaymentContact').val(contact);
+            }
+            if ($('#wdCertRefCode').length) {
+                if (ref) {
+                    $('#wdCertRefCode').val(ref);
+                }
+                $('#wdCertClient').val(client);
+                $('#wdCertTopAddress').val(address);
+                $('#wdCertContact').val(contact);
+            }
+            if ($('#wdScheduleRefCode').length) {
+                if (ref) {
+                    $('#wdScheduleRefCode').val(ref);
+                }
+                $('#wdScheduleClient').val(client);
+                $('#wdScheduleAddress').val(address);
+                $('#wdScheduleContact').val(contact);
+            }
+        }
+
+        function applyWeddingRegistryTopFieldsFromSelectedRow() {
+            var $sel = $('#weddingTableBody tr.is-schedule-selected').first();
+            if (!$sel.length) {
+                return;
+            }
+            applyWeddingRegistryTopFields(registryRowMetaFromTr($sel));
         }
 
         function registryWorkflowNextUrl(currentStep) {
@@ -321,8 +412,8 @@
         function paymentStatusCell(raw) {
             var s = String(raw == null ? '' : raw).trim();
             var lower = s.toLowerCase();
-            if (!s || s === '-') {
-                return '<span class="text-muted">\u2014</span>';
+            if (!s || isEmptyDisplayValue(s)) {
+                return emptyDisplayHtml();
             }
             if (lower === 'paid') {
                 return '<span class="sappc-payment-badge sappc-payment-badge--paid">Paid</span>';
@@ -404,12 +495,13 @@
                 .documentType) + '">' +
                 '<td>' + esc(row.rowNumber) + '</td>' +
                 '<td>' + esc(row.referenceCode) + '</td>' +
-                '<td>' + esc(row.client) + '</td>' +
-                '<td>' + esc(typeof sappcFormatAddress === 'function' ? sappcFormatAddress(row.address) : row
-                    .address) + '</td>';
-            return base + '<td>' + esc(row.contactNum) + '</td>' +
+                '<td>' + registryCellHtml(row.client) + '</td>' +
+                '<td>' + registryCellHtml(row.address, function(v) {
+                    return typeof sappcFormatAddress === 'function' ? sappcFormatAddress(v) : v;
+                }) + '</td>';
+            return base + '<td>' + registryCellHtml(row.contactNum) + '</td>' +
                 (activeSection === 'payment' ? '<td>' + paymentStatusCell(row.paymentStatus) + '</td>' : '') +
-                '<td>' + esc(row.dateCreated) + '</td>' +
+                '<td>' + registryCellHtml(row.dateCreated) + '</td>' +
                 rowActionCell(row.recordId) + '</tr>';
         }
 
@@ -966,7 +1058,7 @@
                     '<td class="sappcPaymentFeeModalCellNo"></td>' +
                     '<td><input type="text" class="sappcPaymentFeeModalItemInput" name="fee_items[]" value="" aria-label="Fee item"></td>' +
                     '<td><span class="sappc-payment-badge sappc-payment-badge--unpaid sappcPaymentFeeModalStatus sappcPaymentFeeModalStatusUnpaid">Unpaid</span></td>' +
-                    '<td><span class="sappcPaymentFeeModalDatePaid" data-date-paid="">\u2014</span></td>' +
+                    '<td><span class="sappcPaymentFeeModalDatePaid sappc-no-data" data-date-paid="">' + esc(sappcNoData) + '</span></td>' +
                     '<td class="text-center"><div class="sappcPaymentFeeModalActions">' +
                     '<button type="button" class="sappc-payment-badge sappc-payment-badge--paid sappcPaymentFeeModalTogglePaid">Paid</button>' +
                     '<button type="button" class="sappcPaymentFeeModalBtnRemove" aria-label="Remove row">' +
@@ -975,7 +1067,7 @@
             }
 
             function formatPaymentFeeDateDisplay(isoYmd) {
-                if (!isoYmd || String(isoYmd).length < 8) return '\u2014';
+                if (!isoYmd || String(isoYmd).length < 8) return sappcNoData;
                 try {
                     var d = new Date(String(isoYmd).slice(0, 10) + 'T12:00:00');
                     if (isNaN(d.getTime())) return String(isoYmd);
@@ -1026,11 +1118,11 @@
                         'sappcPaymentFeeModalToggleUnpaid').text('Unpaid');
                     if (dateIso) {
                         $date.attr('data-date-paid', dateIso);
-                        $date.text(formatPaymentFeeDateDisplay(dateIso));
+                        $date.removeClass('sappc-no-data').text(formatPaymentFeeDateDisplay(dateIso));
                     } else {
                         var today = new Date().toISOString().slice(0, 10);
                         $date.attr('data-date-paid', today);
-                        $date.text(formatPaymentFeeDateDisplay(today));
+                        $date.removeClass('sappc-no-data').text(formatPaymentFeeDateDisplay(today));
                     }
                 } else {
                     $status.removeClass('sappcPaymentFeeModalStatusPaid').addClass(
@@ -1038,7 +1130,7 @@
                     $toggle.removeClass('sappcPaymentFeeModalToggleUnpaid').addClass(
                         'sappcPaymentFeeModalTogglePaid').text('Paid');
                     $date.removeAttr('data-date-paid');
-                    $date.text('\u2014');
+                    $date.addClass('sappc-no-data').text(sappcNoData);
                 }
                 syncWeddingPaymentFeeRowBadgeColors($tr);
                 return $tr;
@@ -1130,7 +1222,7 @@
                     $btn.removeClass('sappcPaymentFeeModalToggleUnpaid').addClass(
                         'sappcPaymentFeeModalTogglePaid').text('Paid');
                     $date.removeAttr('data-date-paid');
-                    $date.text('\u2014');
+                    $date.addClass('sappc-no-data').text(sappcNoData);
                 } else {
                     var iso = new Date().toISOString().slice(0, 10);
                     $status.addClass('sappcPaymentFeeModalStatusPaid').removeClass(
@@ -1138,7 +1230,7 @@
                     $btn.removeClass('sappcPaymentFeeModalTogglePaid').addClass(
                         'sappcPaymentFeeModalToggleUnpaid').text('Unpaid');
                     $date.attr('data-date-paid', iso);
-                    $date.text(formatPaymentFeeDateDisplay(iso));
+                    $date.removeClass('sappc-no-data').text(formatPaymentFeeDateDisplay(iso));
                 }
                 syncWeddingPaymentFeeRowBadgeColors($row);
             });
@@ -1148,6 +1240,7 @@
 
                 $paymentModal.on('shown.bs.modal', function() {
                     $paymentBtn.attr('aria-expanded', 'true');
+                    applyWeddingRegistryTopFieldsFromSelectedRow();
                     syncAllWeddingPaymentFeeRowBadgeColors();
                 });
                 $paymentModal.on('hidden.bs.modal', function() {
@@ -1176,6 +1269,7 @@
                             .done(function(res) {
                                 if (res && res.ok && res.data) {
                                     applyConfirmationPaymentFeeFormObject(res.data);
+                                    applyWeddingRegistryTopFieldsFromSelectedRow();
                                     paymentBsModal.show();
                                 }
                             })
@@ -1544,6 +1638,7 @@
                             if (pay && pay.ok && pay.data) {
                                 applyWeddingCertificationTopFromPayment(pay.data);
                             }
+                            applyWeddingRegistryTopFieldsFromSelectedRow();
                             if (cert && cert.ok && cert.data) {
                                 applyWeddingCertificationFromDetails(cert.data);
                                 stashWeddingCertPrintExtras(cert.data);
@@ -1862,6 +1957,7 @@
 
                 $certModal.on('shown.bs.modal', function() {
                     $certBtn.attr('aria-expanded', 'true');
+                    applyWeddingRegistryTopFieldsFromSelectedRow();
                 });
                 $certModal.on('hidden.bs.modal', function() {
                     $certBtn.attr('aria-expanded', 'false');
@@ -1907,6 +2003,98 @@
                     return;
                 }
 
+                var weddingGodparentInitialRows = 10;
+                var weddingGodparentMaxRows = 20;
+                var weddingGodparentRowCount = 0;
+
+                function updateWeddingGodparentToolbarBtns() {
+                    $('#wdAppGpAddBtn').prop('disabled', weddingGodparentRowCount >= weddingGodparentMaxRows);
+                    $('#wdAppGpDeleteBtn').prop('disabled', weddingGodparentRowCount <= 1);
+                }
+
+                function appendWeddingGodparentRow() {
+                    if (weddingGodparentRowCount >= weddingGodparentMaxRows) {
+                        updateWeddingGodparentToolbarBtns();
+                        return;
+                    }
+                    weddingGodparentRowCount += 1;
+                    var row = weddingGodparentRowCount;
+                    var idxA = (2 * row) - 1;
+                    var idxB = 2 * row;
+                    var $colA = $('#wdAppGpColA');
+                    var $colB = $('#wdAppGpColB');
+                    if (!$colA.length || !$colB.length) {
+                        return;
+                    }
+                    $('<input/>', {
+                        type: 'text',
+                        class: 'sappcKasalLineIn sappcKasalLineIn--sm',
+                        name: 'marriage_sponsors[' + idxA + ']',
+                        id: 'wdAppSponsor' + idxA,
+                        'aria-label': 'Maninoy ' + row,
+                        placeholder: 'Juan D. Cruz',
+                    }).appendTo($colA);
+                    $('<input/>', {
+                        type: 'text',
+                        class: 'sappcKasalLineIn sappcKasalLineIn--sm',
+                        name: 'marriage_sponsors[' + idxB + ']',
+                        id: 'wdAppSponsor' + idxB,
+                        'aria-label': 'Maninay ' + row,
+                        placeholder: 'Maria D. Cruz',
+                    }).appendTo($colB);
+                    updateWeddingGodparentToolbarBtns();
+                }
+
+                function removeWeddingGodparentRow() {
+                    if (weddingGodparentRowCount <= 1) {
+                        updateWeddingGodparentToolbarBtns();
+                        return;
+                    }
+                    $('#wdAppGpColA').children().last().remove();
+                    $('#wdAppGpColB').children().last().remove();
+                    weddingGodparentRowCount -= 1;
+                    updateWeddingGodparentToolbarBtns();
+                }
+
+                function ensureWeddingGodparentRows(minRows) {
+                    var target = Math.max(1, Math.min(weddingGodparentMaxRows, parseInt(minRows, 10) || 1));
+                    while (weddingGodparentRowCount < target) {
+                        appendWeddingGodparentRow();
+                    }
+                }
+
+                function resetWeddingGodparentRows() {
+                    $('#wdAppGpColA, #wdAppGpColB').empty();
+                    weddingGodparentRowCount = 0;
+                    ensureWeddingGodparentRows(weddingGodparentInitialRows);
+                }
+
+                function maxWeddingSponsorRowFromData(data) {
+                    var maxIdx = 0;
+                    if (!data || typeof data !== 'object' || !data.marriage_sponsors || typeof data.marriage_sponsors !== 'object') {
+                        return 0;
+                    }
+                    Object.keys(data.marriage_sponsors).forEach(function(k) {
+                        var n = parseInt(k, 10);
+                        if (isNaN(n) || n < 1) {
+                            return;
+                        }
+                        var v = data.marriage_sponsors[k];
+                        if (v != null && String(v).trim() !== '') {
+                            maxIdx = Math.max(maxIdx, n);
+                        }
+                    });
+                    return maxIdx > 0 ? Math.ceil(maxIdx / 2) : 0;
+                }
+
+                resetWeddingGodparentRows();
+                $(document).on('click', '#wdAppGpAddBtn', function() {
+                    appendWeddingGodparentRow();
+                });
+                $(document).on('click', '#wdAppGpDeleteBtn', function() {
+                    removeWeddingGodparentRow();
+                });
+
                 function fieldByName($f, n) {
                     if (!$f.length) return $();
                     return $f.find('[name="' + String(n).replace(/\\/g, '\\\\').replace(/"/g, '\\"') +
@@ -1923,10 +2111,13 @@
                 }
 
                 function applyMarriageApplicationData(data) {
-                    if (!data || typeof data !== 'object') {
-                        return;
-                    }
+                    data = data && typeof data === 'object' ? data : {};
                     var $f = $marriageAppForm;
+                    resetWeddingGodparentRows();
+                    var gpNeeded = Math.max(weddingGodparentInitialRows, maxWeddingSponsorRowFromData(data));
+                    if (gpNeeded > weddingGodparentRowCount) {
+                        ensureWeddingGodparentRows(gpNeeded);
+                    }
                     $f.find('input[type="checkbox"]').each(function() {
                         var n = this.name;
                         if (!n) {
@@ -1982,15 +2173,12 @@
                         }
                     }
                     if (data.marriage_sponsors && typeof data.marriage_sponsors === 'object') {
-                        for (var g = 1; g <= 40; g++) {
-                            var v = data.marriage_sponsors[String(g)];
-                            if (v == null) {
-                                v = data.marriage_sponsors[g];
-                            }
+                        Object.keys(data.marriage_sponsors).forEach(function(k) {
+                            var v = data.marriage_sponsors[k];
                             if (v != null) {
-                                fieldByName($f, 'marriage_sponsors[' + g + ']').val(String(v));
+                                fieldByName($f, 'marriage_sponsors[' + k + ']').val(String(v));
                             }
-                        }
+                        });
                     }
                 }
 
@@ -2028,11 +2216,12 @@
                         });
                     }
                     out.marriage_sponsors = {};
-                    for (var g = 1; g <= 40; g++) {
-                        out.marriage_sponsors[String(g)] = (fieldByName($f, 'marriage_sponsors[' + g +
-                                ']').val() ||
-                            '').trim();
-                    }
+                    $f.find('[name^="marriage_sponsors["]').each(function() {
+                        var m = /^marriage_sponsors\[(\d+)\]$/.exec(this.name);
+                        if (m) {
+                            out.marriage_sponsors[m[1]] = ($(this).val() || '').trim();
+                        }
+                    });
                     return out;
                 }
 
@@ -2511,25 +2700,27 @@
                     return;
                 }
                 setSelectedWeddingId($tr.attr('data-record-id') || '');
+                var rowMeta = registryRowMetaFromTr($tr);
+                if (activeSection === 'payment' || activeSection === 'certification') {
+                    applyWeddingRegistryTopFields(rowMeta);
+                    return;
+                }
                 if (activeSection !== 'schedule' || !$scheduleForm.length) {
                     return;
                 }
                 var $tds = $tr.find('td');
                 if ($tds.length < 6) return;
-                $('#wdScheduleRefCode').val(($tds.eq(1).text() || '').trim());
-                $('#wdScheduleClient').val(($tds.eq(2).text() || '').trim());
-                $('#wdScheduleAddress').val(($tds.eq(3).text() || '').trim());
-                var rawSex = ($tds.eq(4).text() || '').trim();
-                if (rawSex === '\u2014' || rawSex === '-' || rawSex === '') {
-                    $('#wdScheduleSex').val('');
+                if (rowMeta) {
+                    applyWeddingRegistryTopFields(rowMeta);
                 } else {
-                    $('#wdScheduleSex').val(rawSex);
+                    $('#wdScheduleRefCode').val(($tds.eq(1).text() || '').trim());
+                    $('#wdScheduleClient').val(($tds.eq(2).text() || '').trim());
+                    $('#wdScheduleAddress').val(($tds.eq(3).text() || '').trim());
+                    var rawContact = ($tds.eq(4).text() || '').trim();
+                    $('#wdScheduleContact').val(
+                        isEmptyDisplayValue(rawContact) ? '' : formatPhMobileDisplay(rawContact)
+                    );
                 }
-                var rawContact = ($tds.eq(5).text() || '').trim();
-                $('#wdScheduleContact').val(
-                    (rawContact === '\u2014' || rawContact === '-' || rawContact === '') ? '' :
-                    formatPhMobileDisplay(rawContact)
-                );
             });
 
             if ($scheduleForm.length && scheduleSaveUrl) {

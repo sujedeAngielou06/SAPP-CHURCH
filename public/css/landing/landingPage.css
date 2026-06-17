@@ -28,21 +28,6 @@ body.landing-page::before {
     pointer-events: none;
 }
 
-.landing-ribbon {
-    position: fixed;
-    right: -10rem;
-    bottom: 0;
-    z-index: 1;
-    pointer-events: none;
-    width: min(95vw, 1000px);
-    height: min(95vh, 1000px);
-    background-color: transparent;
-    background-size: contain;
-    background-position: right bottom;
-    background-repeat: no-repeat;
-    mix-blend-mode: screen;
-}
-
 @media (max-width: 768px) {
     body.landing-page {
         background-attachment: scroll;

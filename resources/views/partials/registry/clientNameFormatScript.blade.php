@@ -20,7 +20,7 @@
 
         window.sappcFormatClientDisplayName = function(value) {
             var s = String(value == null ? '' : value).trim();
-            if (!s.length || s === '\u2014' || s === '—') {
+            if (!s.length || window.sappcIsEmptyDisplayValue(s)) {
                 return s;
             }
             return s.split(/\s+/).map(function(part) {
@@ -33,7 +33,7 @@
 
         window.sappcFormatAddress = function(value) {
             var s = String(value == null ? '' : value).trim();
-            if (!s.length || s === '\u2014' || s === '—') {
+            if (!s.length || window.sappcIsEmptyDisplayValue(s)) {
                 return s;
             }
             return titleCaseNamePart(s);
@@ -53,6 +53,40 @@
 
         window.sappcCapitalizeNamePart = capitalizeNamePart;
         window.sappcTitleCaseNamePart = titleCaseNamePart;
+
+        window.sappcNoDataProvided = 'No Data Provided';
+
+        window.sappcEscapeHtml = function(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        };
+
+        window.sappcEmptyDisplayHtml = function() {
+            return '<span class="sappc-no-data">' + window.sappcEscapeHtml(window.sappcNoDataProvided) + '</span>';
+        };
+
+        window.sappcRegistryCellHtml = function(value, formatter) {
+            var display = (typeof formatter === 'function') ? formatter(value) : value;
+            display = display == null ? '' : String(display).trim();
+            if (!display.length || window.sappcIsEmptyDisplayValue(display)) {
+                return window.sappcEmptyDisplayHtml();
+            }
+            return window.sappcEscapeHtml(display);
+        };
+
+        window.sappcIsEmptyDisplayValue = function(value) {
+            var s = String(value == null ? '' : value).trim();
+            if (!s.length) {
+                return true;
+            }
+            if (s === '\u2014' || s === '-' || s === '\u2212') {
+                return true;
+            }
+            return s.toLowerCase() === String(window.sappcNoDataProvided || 'No Data Provided').toLowerCase();
+        };
 
         function fieldKey($el) {
             return (String($el.attr('id') || '') + ' ' + String($el.attr('name') || '')).toLowerCase();

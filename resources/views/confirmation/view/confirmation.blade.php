@@ -296,11 +296,27 @@
     
                         <div class="sappcCnGpBlock">
                             <p class="sappcCnGpHead">NGALAN KANG MANINOY KAG MANINAY SA PAGKOMPIRMA <span class="sappcCnAppHint">(Name of Godparents)</span></p>
-                            <div class="sappcCnGpGrid">
-                                <input type="text" class="sappcCnAppIn" name="godparent_1" id="cnAppGp1" aria-label="Godparent 1" placeholder=" ">
-                                <input type="text" class="sappcCnAppIn" name="godparent_2" id="cnAppGp2" aria-label="Godparent 2" placeholder=" ">
-                                <input type="text" class="sappcCnAppIn" name="godparent_3" id="cnAppGp3" aria-label="Godparent 3" placeholder=" ">
-                                <input type="text" class="sappcCnAppIn" name="godparent_4" id="cnAppGp4" aria-label="Godparent 4" placeholder=" ">
+                            <div class="sappc-gp-toolbar">
+                                <div class="sappc-gp-col-heads" aria-hidden="true">
+                                    <span>Maninoy</span>
+                                    <span>Maninay</span>
+                                </div>
+                                <div class="sappc-gp-toolbar-actions">
+                                    <button type="button" class="sappc-gp-btn sappc-gp-btn--add" id="cnAppGpAddBtn"
+                                        aria-label="Add godparent row">
+                                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                                        <span>Add</span>
+                                    </button>
+                                    <button type="button" class="sappc-gp-btn sappc-gp-btn--delete" id="cnAppGpDeleteBtn"
+                                        aria-label="Remove last godparent row">
+                                        <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                        <span>Delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="sappc-gp-cols">
+                                <div class="sappc-gp-col" id="cnAppGpColA"></div>
+                                <div class="sappc-gp-col" id="cnAppGpColB"></div>
                             </div>
                         </div>
     

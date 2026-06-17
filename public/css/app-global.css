@@ -115,3 +115,109 @@ optgroup {
 .dataTables_paginate .paginate_button {
     font-family: var(--sappc-font-family);
 }
+
+.sappc-no-data {
+    color: rgba(108, 117, 125, 0.55);
+}
+
+/* Godparent / sponsor row toolbar (shared across sacrament application forms) */
+.sappc-gp-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 0.35rem;
+}
+
+.sappc-gp-col-heads {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem 1.75rem;
+    flex: 1 1 12rem;
+    min-width: 0;
+}
+
+.sappc-gp-col-heads span {
+    font-size: 0.62rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: center;
+    color: #111;
+}
+
+.sappc-gp-toolbar-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 0 0 auto;
+}
+
+.sappc-gp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.34rem 0.8rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    line-height: 1.2;
+    border-radius: 0.3rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sappc-gp-btn i {
+    font-size: 0.68rem;
+    pointer-events: none;
+}
+
+.sappc-gp-btn--add {
+    background: linear-gradient(180deg, #f4fbf5 0%, #e8f5ea 100%);
+    border-color: #4a8f57;
+    color: #2d6a3a;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+.sappc-gp-btn--add:hover:not(:disabled) {
+    background: linear-gradient(180deg, #e8f5ea 0%, #d9eedc 100%);
+    border-color: #3d7a4a;
+}
+
+.sappc-gp-btn--delete {
+    background: linear-gradient(180deg, #fff8f8 0%, #fceeee 100%);
+    border-color: #c96a6a;
+    color: #9b3a3a;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+.sappc-gp-btn--delete:hover:not(:disabled) {
+    background: linear-gradient(180deg, #fceeee 0%, #f8dede 100%);
+    border-color: #b85555;
+}
+
+.sappc-gp-btn:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.sappc-gp-btn:focus-visible {
+    outline: 2px solid #1c426e;
+    outline-offset: 2px;
+}
+
+.sappc-gp-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem 1.75rem;
+}
+
+.sappc-gp-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    min-width: 0;
+}

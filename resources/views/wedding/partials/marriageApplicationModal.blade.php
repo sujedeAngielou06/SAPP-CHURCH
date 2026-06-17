@@ -65,18 +65,13 @@
                                             Name</p>
                                     </div>
                                     <div class="sappcKasalFieldRow sappcKasalFieldRow--ageDob">
-                                        <div class="sappcKasalField sappcKasalField--short">
-                                            <label class="sappcKasalFieldLabel" for="wdApp{{ $sp['pfirst'] }}Age">Age</label>
-                                            <input type="text" class="sappcKasalLineIn sappcKasalLineIn--short"
-                                                id="wdApp{{ $sp['pfirst'] }}Age" name="{{ $sp['prefix'] }}_age" inputmode="numeric"
-                                                maxlength="3" aria-label="Age">
-                                        </div>
-                                        <div class="sappcKasalField sappcKasalField--short">
-                                            <label class="sappcKasalFieldLabel" for="wdApp{{ $sp['pfirst'] }}Dob">Date of
-                                                Birth</label>
-                                            <input type="date" class="sappcKasalLineIn sappcKasalLineIn--short" id="wdApp{{ $sp['pfirst'] }}Dob"
-                                                name="{{ $sp['prefix'] }}_date_of_birth">
-                                        </div>
+                                        <label class="sappcKasalFieldLabel" for="wdApp{{ $sp['pfirst'] }}Age">Age</label>
+                                        <input type="text" class="sappcKasalLineIn sappcKasalLineIn--age"
+                                            id="wdApp{{ $sp['pfirst'] }}Age" name="{{ $sp['prefix'] }}_age" inputmode="numeric"
+                                            maxlength="3" aria-label="Age">
+                                        <label class="sappcKasalFieldLabel" for="wdApp{{ $sp['pfirst'] }}Dob">Date of Birth</label>
+                                        <input type="date" class="sappcKasalLineIn" id="wdApp{{ $sp['pfirst'] }}Dob"
+                                            name="{{ $sp['prefix'] }}_date_of_birth">
                                     </div>
                                     <div class="sappcKasalField">
                                         <label class="sappcKasalFieldLabel" for="wdApp{{ $sp['pfirst'] }}Pob">Place of
@@ -173,11 +168,13 @@
                             <input type="text" class="sappcKasalLineIn" id="wdAppOfficiatingPriest"
                                 name="officiating_priest">
                         </div>
-                        <div class="sappcKasalField" style="margin-top:0.3rem">
-                            <span class="sappcKasalFieldLabel">Sponsors</span>
-                            <input type="text" class="sappcKasalLineIn" id="wdAppSponsorLine1" name="sponsors_line1" aria-label="Sponsor line 1">
-                            <input type="text" class="sappcKasalLineIn mt-1" id="wdAppSponsorLine2" name="sponsors_line2" aria-label="Sponsor line 2">
-                            <input type="text" class="sappcKasalLineIn mt-1" id="wdAppSponsorLine3" name="sponsors_line3" aria-label="Sponsor line 3">
+                        <div class="sappcKasalGenRow sappcKasalGenRow--sponsors">
+                            <span class="sappcKasalGenLabel">Sponsors</span>
+                            <div class="sappcKasalSponsorLines">
+                                <input type="text" class="sappcKasalLineIn" id="wdAppSponsorLine1" name="sponsors_line1" aria-label="Sponsor line 1">
+                                <input type="text" class="sappcKasalLineIn" id="wdAppSponsorLine2" name="sponsors_line2" aria-label="Sponsor line 2">
+                                <input type="text" class="sappcKasalLineIn" id="wdAppSponsorLine3" name="sponsors_line3" aria-label="Sponsor line 3">
+                            </div>
                         </div>
                     </section>
 
@@ -259,14 +256,27 @@
                     </div>
 
                     <h3 class="sappcKasalSponsorHead">LISTAHAN SANG MGA MANINOY KAG MANINAY</h3>
-                    <div class="sappcKasalSponsorGrid" aria-label="Sponsor names">
-                        @for ($g = 1; $g <= 40; $g++)
-                            <div class="sappcKasalSponsorCell">
-                                <span class="sappcKasalSponsorBullet" aria-hidden="true">&#8226;</span>
-                                <input type="text" class="sappcKasalLineIn sappcKasalLineIn--sm" name="marriage_sponsors[{{ $g }}]"
-                                    id="wdAppSponsor{{ $g }}" aria-label="Sponsor {{ $g }}">
-                            </div>
-                        @endfor
+                    <div class="sappc-gp-toolbar">
+                        <div class="sappc-gp-col-heads" aria-hidden="true">
+                            <span>Maninoy</span>
+                            <span>Maninay</span>
+                        </div>
+                        <div class="sappc-gp-toolbar-actions">
+                            <button type="button" class="sappc-gp-btn sappc-gp-btn--add" id="wdAppGpAddBtn"
+                                aria-label="Add sponsor row">
+                                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                                <span>Add</span>
+                            </button>
+                            <button type="button" class="sappc-gp-btn sappc-gp-btn--delete" id="wdAppGpDeleteBtn"
+                                aria-label="Remove last sponsor row">
+                                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="sappc-gp-cols sappcKasalSponsorGpCols" aria-label="Sponsor names">
+                        <div class="sappc-gp-col" id="wdAppGpColA"></div>
+                        <div class="sappc-gp-col" id="wdAppGpColB"></div>
                     </div>
 
                     <div class="sappcKasalApproval" aria-label="Approvals">

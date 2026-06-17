@@ -9,6 +9,13 @@ final class ClientNameDisplay
 {
     private const DISPLAY_TIMEZONE = 'Asia/Taipei';
 
+    public const EMPTY_DISPLAY = 'No Data Provided';
+
+    public static function emptyDisplay(): string
+    {
+        return self::EMPTY_DISPLAY;
+    }
+
     public static function capitalizeNamePart(?string $name): string
     {
         $s = trim((string) ($name ?? ''));
@@ -213,7 +220,7 @@ final class ClientNameDisplay
     public static function formatDateCreated(mixed $value): string
     {
         if ($value === null || $value === '') {
-            return '—';
+            return self::EMPTY_DISPLAY;
         }
 
         if ($value instanceof CarbonInterface) {
@@ -223,14 +230,14 @@ final class ClientNameDisplay
         try {
             return Carbon::parse($value)->format('F j, Y');
         } catch (\Throwable) {
-            return '—';
+            return self::EMPTY_DISPLAY;
         }
     }
 
     public static function formatDateTimeCreated(mixed $value, ?string $timezone = self::DISPLAY_TIMEZONE): string
     {
         if ($value === null || $value === '') {
-            return '—';
+            return self::EMPTY_DISPLAY;
         }
 
         try {
@@ -244,7 +251,7 @@ final class ClientNameDisplay
 
             return $dt->format('F j, Y g:i A');
         } catch (\Throwable) {
-            return '—';
+            return self::EMPTY_DISPLAY;
         }
     }
 

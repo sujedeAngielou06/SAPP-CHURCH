@@ -63,7 +63,7 @@
 #weddingMarriageApplicationModal .sappcKasalAppTitle {
     margin: 0.35rem 0 0;
     color: #5c1a0f;
-    font-weight: 400;
+    font-weight: 700;
     font-size: 1.35rem;
     letter-spacing: 0.08em;
     text-align: center;
@@ -83,7 +83,7 @@
 
 #weddingMarriageApplicationModal .sappcKasalBoxTitle--above {
     text-align: center;
-    font-weight: 400;
+    font-weight: 700;
     font-size: 1.1rem;
     letter-spacing: 0.14em;
     margin: 0 0 0.35rem 0;
@@ -101,29 +101,47 @@
     min-height: 100%;
     background: #fff;
     text-align: left;
+    --sappc-kasal-box-label: 6.75rem;
 }
 
 #weddingMarriageApplicationModal .sappcKasalField {
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.32rem;
 }
 
+#weddingMarriageApplicationModal .sappcKasalField--name,
+#weddingMarriageApplicationModal .sappcKasalField--mother,
 #weddingMarriageApplicationModal .sappcKasalField:not(.sappcKasalField--name):not(.sappcKasalField--mother) {
     display: grid;
-    grid-template-columns: var(--sappc-app-label-col) minmax(0, 1fr);
-    gap: 0.12rem var(--sappc-app-field-gap);
-    align-items: end;
+    grid-template-columns: var(--sappc-kasal-box-label) minmax(0, 1fr);
+    gap: 0.1rem var(--sappc-app-field-gap);
+    align-items: center;
 }
 
+#weddingMarriageApplicationModal .sappcKasalField--name .sappcKasalFieldLabel,
+#weddingMarriageApplicationModal .sappcKasalField--mother .sappcKasalFieldLabel,
 #weddingMarriageApplicationModal .sappcKasalField:not(.sappcKasalField--name):not(.sappcKasalField--mother) .sappcKasalFieldLabel {
     margin: 0;
     align-self: center;
 }
 
+#weddingMarriageApplicationModal .sappcKasalField--name .sappcKasalFieldSub--center {
+    grid-column: 1 / -1;
+    margin: 0.06rem 0 0.12rem;
+    padding: 0;
+}
+
+#weddingMarriageApplicationModal .sappcKasalField--mother .sappcKasalFieldSub--center {
+    grid-column: 2 / -1;
+    margin: 0.04rem 0 0.08rem;
+    padding: 0;
+    text-align: center;
+}
+
 #weddingMarriageApplicationModal .sappcKasalFieldLabel {
     display: block;
-    font-size: 0.875rem;
-    line-height: 1.1;
-    margin: 0 0 0.05rem 0;
+    font-size: 0.8125rem;
+    line-height: 1.15;
+    margin: 0;
     font-weight: 400;
 }
 
@@ -148,29 +166,30 @@
 }
 
 #weddingMarriageApplicationModal p.sappcKasalFieldSub--center {
-    margin-top: 0.12rem;
-    margin-bottom: 0.2rem;
-}
-
-#weddingMarriageApplicationModal .sappcKasalField--mother {
-    margin-bottom: 0.4rem;
+    margin-top: 0.06rem;
+    margin-bottom: 0.1rem;
 }
 
 #weddingMarriageApplicationModal .sappcKasalFieldRow--ageDob {
     display: grid;
-    grid-template-columns: var(--sappc-app-label-col) minmax(0, 1fr) var(--sappc-app-label-col) minmax(0, 1fr);
-    gap: 0.12rem var(--sappc-app-field-gap);
-    align-items: end;
-    margin-bottom: 0.4rem;
+    grid-template-columns: var(--sappc-kasal-box-label) minmax(2.25rem, 0.42fr) minmax(5.25rem, auto) minmax(0, 1fr);
+    gap: 0.1rem 0.35rem;
+    align-items: center;
+    margin-bottom: 0.32rem;
 }
 
-#weddingMarriageApplicationModal .sappcKasalFieldRow--ageDob .sappcKasalField--short {
-    display: contents;
-}
-
-#weddingMarriageApplicationModal .sappcKasalFieldRow--ageDob .sappcKasalField--short .sappcKasalFieldLabel {
-    align-self: center;
+#weddingMarriageApplicationModal .sappcKasalFieldRow--ageDob .sappcKasalFieldLabel {
     margin: 0;
+    white-space: nowrap;
+}
+
+#weddingMarriageApplicationModal .sappcKasalFieldRow--ageDob .sappcKasalLineIn {
+    width: 100%;
+    min-width: 0;
+}
+
+#weddingMarriageApplicationModal .sappcKasalLineIn--age {
+    max-width: 3.5rem;
 }
 
 #weddingMarriageApplicationModal .sappcKasalField--short {
@@ -198,11 +217,11 @@
     border-bottom: 1px solid #000;
     border-radius: 0;
     background: transparent;
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     line-height: 1.2;
-    padding: 0.15rem 0.05rem 0.12rem 0;
+    padding: 0.1rem 0.05rem 0.08rem 0;
     box-shadow: none;
-    min-height: 1.45rem;
+    min-height: 1.35rem;
 }
 
 #weddingMarriageApplicationModal .sappcKasalLineIn--sm {
@@ -219,13 +238,16 @@
 }
 
 #weddingMarriageApplicationModal .sappcKasalLineIn[type="date"] {
-    min-height: 1.4rem;
+    min-height: 1.35rem;
+    padding-right: 0.1rem;
+    line-height: 1.2;
 }
 
-#weddingMarriageApplicationModal .sappcKasalField--short .sappcKasalLineIn[type="date"] {
-    min-height: 1.25rem;
-    font-size: 0.8125rem;
-    padding-bottom: 0.05rem;
+#weddingMarriageApplicationModal .sappcKasalLineIn[type="date"]::-webkit-calendar-picker-indicator {
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0.8;
 }
 
 #weddingMarriageApplicationModal .sappcKasalGeneral {
@@ -288,6 +310,28 @@
     vertical-align: middle;
 }
 
+#weddingMarriageApplicationModal .sappcKasalGenRow--sponsors {
+    align-items: start;
+    margin-top: 0.15rem;
+}
+
+#weddingMarriageApplicationModal .sappcKasalGenRow--sponsors .sappcKasalGenLabel {
+    align-self: start;
+    padding-top: 0.12rem;
+}
+
+#weddingMarriageApplicationModal .sappcKasalSponsorLines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+    width: 100%;
+}
+
+#weddingMarriageApplicationModal .sappcKasalSponsorLines .sappcKasalLineIn {
+    width: 100%;
+}
+
 #weddingMarriageApplicationModal .sappcKasalDocGrid {
     display: flex;
     flex-wrap: wrap;
@@ -339,6 +383,15 @@
 #weddingMarriageApplicationModal .sappcKasalAdminInput {
     width: 100%;
     min-height: 1.4rem;
+    text-align: center;
+}
+
+#weddingMarriageApplicationModal .sappcKasalAdminInput[type="date"] {
+    text-align: center;
+}
+
+#weddingMarriageApplicationModal .sappcKasalAdminInput[type="date"]::-webkit-datetime-edit {
+    text-align: center;
 }
 
 #weddingMarriageApplicationModal .sappcKasalAdminCap {
@@ -347,6 +400,7 @@
     margin-top: 0.15rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+    text-align: center;
 }
 
 #weddingMarriageApplicationModal .sappcKasalPrecanaWrap {
@@ -365,7 +419,7 @@
 #weddingMarriageApplicationModal .sappcKasalPrecanaTitle {
     margin: 0;
     font-size: 1.35rem;
-    font-weight: 400;
+    font-weight: 700;
     font-style: italic;
     color: #8b1e35;
     text-shadow: 1px 1px 0 #2a4a7a, 2px 2px 0 #1a3a6e;
@@ -384,7 +438,7 @@
     margin: 0.25rem 0 0.35rem;
     text-align: center;
     font-size: 0.9375rem;
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
 }
@@ -438,41 +492,21 @@
 #weddingMarriageApplicationModal .sappcKasalSponsorHead {
     text-align: center;
     font-size: 1rem;
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     margin: 0.55rem 0 0.2rem;
     color: #111;
 }
 
-#weddingMarriageApplicationModal .sappcKasalSponsorGrid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.15rem 0.4rem;
+#weddingMarriageApplicationModal .sappcKasalSponsorGpCols {
     margin: 0.45rem 0 0.6rem;
-    padding: 0.25rem 0.15rem;
+    padding: 0.35rem 0.5rem;
     border: 1px solid #2a2a2a;
     background: #fffcf7;
 }
 
-#weddingMarriageApplicationModal .sappcKasalSponsorCell {
-    display: flex;
-    align-items: center;
-    gap: 0.15rem;
-    min-width: 0;
-}
-
-#weddingMarriageApplicationModal .sappcKasalSponsorCell .sappcKasalSponsorBullet {
-    flex: 0 0 0.45rem;
-    color: #000;
-    font-size: 1.1rem;
-    line-height: 1;
-    user-select: none;
-}
-
-#weddingMarriageApplicationModal .sappcKasalSponsorCell .sappcKasalLineIn--sm {
-    flex: 1 1 auto;
-    min-width: 0;
+#weddingMarriageApplicationModal .sappcKasalSponsorGpCols .sappcKasalLineIn--sm {
     font-size: 0.8125rem;
     min-height: 1.2rem;
 }
@@ -543,22 +577,31 @@
         margin-bottom: 0.5rem;
     }
 
-    #weddingMarriageApplicationModal .sappcKasalSponsorGrid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    #weddingMarriageApplicationModal .sappcKasalSponsorGpCols {
+        grid-template-columns: 1fr;
     }
 
     #weddingMarriageApplicationModal .sappcKasalGenRow,
-    #weddingMarriageApplicationModal .sappcKasalGeneral .sappcKasalField,
+    #weddingMarriageApplicationModal .sappcKasalGeneral .sappcKasalField {
+        grid-template-columns: 1fr;
+    }
+
+    #weddingMarriageApplicationModal .sappcKasalField--name,
+    #weddingMarriageApplicationModal .sappcKasalField--mother,
     #weddingMarriageApplicationModal .sappcKasalField:not(.sappcKasalField--name):not(.sappcKasalField--mother) {
         grid-template-columns: 1fr;
     }
 
-    #weddingMarriageApplicationModal .sappcKasalFieldRow--ageDob {
-        grid-template-columns: 1fr 1fr;
+    #weddingMarriageApplicationModal .sappcKasalField--mother .sappcKasalFieldSub--center {
+        grid-column: 1 / -1;
     }
 
-    #weddingMarriageApplicationModal .sappcKasalFieldRow--ageDob .sappcKasalField--short {
-        display: block;
+    #weddingMarriageApplicationModal .sappcKasalFieldRow--ageDob {
+        grid-template-columns: var(--sappc-kasal-box-label) minmax(0, 1fr);
+    }
+
+    #weddingMarriageApplicationModal .sappcKasalLineIn--age {
+        max-width: none;
     }
 
     #weddingMarriageApplicationModal .sappcKasalGenLabel {

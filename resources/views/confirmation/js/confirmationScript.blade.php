@@ -8,6 +8,34 @@
 
         var initialTablePayload = @json($initialTablePayload);
         var activeSection = @json($activeSection);
+        var sappcNoData = window.sappcNoDataProvided || 'No Data Provided';
+
+        function isEmptyDisplayValue(v) {
+            if (typeof window.sappcIsEmptyDisplayValue === 'function') {
+                return window.sappcIsEmptyDisplayValue(v);
+            }
+            var s = String(v == null ? '' : v).trim();
+            return !s || s === '\u2014' || s === '-' || s.toLowerCase() === sappcNoData.toLowerCase();
+        }
+
+        function emptyDisplayHtml() {
+            if (typeof window.sappcEmptyDisplayHtml === 'function') {
+                return window.sappcEmptyDisplayHtml();
+            }
+            return '<span class="sappc-no-data">' + esc(sappcNoData) + '</span>';
+        }
+
+        function registryCellHtml(value, formatter) {
+            if (typeof window.sappcRegistryCellHtml === 'function') {
+                return window.sappcRegistryCellHtml(value, formatter);
+            }
+            var display = (typeof formatter === 'function') ? formatter(value) : value;
+            display = display == null ? '' : String(display).trim();
+            if (isEmptyDisplayValue(display)) {
+                return emptyDisplayHtml();
+            }
+            return esc(display);
+        }
 
         function getSelectedConfirmationId() {
             var cid = ($('#cnSelectedConfirmationId').val() || '').trim();
@@ -31,6 +59,69 @@
             if ($('#cnScheduleConfirmationId').length) {
                 $('#cnScheduleConfirmationId').val(id);
             }
+        }
+
+        function registryRowMetaFromTr($tr) {
+            var $tds = $tr.find('td');
+            if ($tds.length < 5) {
+                return null;
+            }
+            var rawContact = ($tds.eq(4).text() || '').trim();
+            return {
+                reference_code: ($tds.eq(1).text() || '').trim(),
+                client: ($tds.eq(2).text() || '').trim(),
+                address: ($tds.eq(3).text() || '').trim(),
+                contact_number: isEmptyDisplayValue(rawContact) ? '' : formatPhMobileDisplay(rawContact),
+            };
+        }
+
+        function applyConfirmationRegistryTopFields(meta) {
+            if (!meta || typeof meta !== 'object') {
+                return;
+            }
+            var ref = meta.reference_code != null ? String(meta.reference_code).trim() : '';
+            var client = meta.client != null ? String(meta.client).trim() : '';
+            var address = meta.address != null ? String(meta.address).trim() : '';
+            var contact = meta.contact_number != null ? String(meta.contact_number).trim() : '';
+            if (isEmptyDisplayValue(ref)) ref = '';
+            if (isEmptyDisplayValue(client)) client = '';
+            if (isEmptyDisplayValue(address)) address = '';
+            if (isEmptyDisplayValue(contact)) contact = '';
+            if (address && typeof sappcFormatAddress === 'function') {
+                address = sappcFormatAddress(address);
+            }
+            if ($('#cnPaymentRefCode').length) {
+                if (ref) {
+                    $('#cnPaymentRefCode').val(ref);
+                }
+                $('#cnPaymentClient').val(client);
+                $('#cnPaymentAddress').val(address);
+                $('#cnPaymentContact').val(contact);
+            }
+            if ($('#cnCertRefCode').length) {
+                if (ref) {
+                    $('#cnCertRefCode').val(ref);
+                }
+                $('#cnCertClient').val(client);
+                $('#cnCertTopAddress').val(address);
+                $('#cnCertContact').val(contact);
+            }
+            if ($('#cnScheduleRefCode').length) {
+                if (ref) {
+                    $('#cnScheduleRefCode').val(ref);
+                }
+                $('#cnScheduleClient').val(client);
+                $('#cnScheduleAddress').val(address);
+                $('#cnScheduleContact').val(contact);
+            }
+        }
+
+        function applyConfirmationRegistryTopFieldsFromSelectedRow() {
+            var $sel = $('#confirmationTableBody tr.is-schedule-selected').first();
+            if (!$sel.length) {
+                return;
+            }
+            applyConfirmationRegistryTopFields(registryRowMetaFromTr($sel));
         }
 
         function registryWorkflowNextUrl(currentStep) {
@@ -322,8 +413,8 @@
         function paymentStatusCell(raw) {
             var s = String(raw == null ? '' : raw).trim();
             var lower = s.toLowerCase();
-            if (!s || s === '\u2014') {
-                return '<span class="text-muted">\u2014</span>';
+            if (!s || isEmptyDisplayValue(s)) {
+                return emptyDisplayHtml();
             }
             if (lower === 'paid') {
                 return '<span class="sappc-payment-badge sappc-payment-badge--paid">Paid</span>';
@@ -341,11 +432,15 @@
                 '">' +
                 '<td>' + esc(row.rowNumber) + '</td>' +
                 '<td>' + esc(row.referenceCode) + '</td>' +
-                '<td>' + esc(typeof sappcFormatClientDisplayName === 'function' ? sappcFormatClientDisplayName(row.client) : row.client) + '</td>' +
-                '<td>' + esc(typeof sappcFormatAddress === 'function' ? sappcFormatAddress(row.address) : row.address) + '</td>' +
-                '<td>' + esc(row.contactNum) + '</td>' +
+                '<td>' + registryCellHtml(row.client, function(v) {
+                    return typeof sappcFormatClientDisplayName === 'function' ? sappcFormatClientDisplayName(v) : v;
+                }) + '</td>' +
+                '<td>' + registryCellHtml(row.address, function(v) {
+                    return typeof sappcFormatAddress === 'function' ? sappcFormatAddress(v) : v;
+                }) + '</td>' +
+                '<td>' + registryCellHtml(row.contactNum) + '</td>' +
                 (activeSection === 'payment' ? '<td>' + paymentStatusCell(row.paymentStatus) + '</td>' : '') +
-                '<td>' + esc(row.dateCreated) + '</td>' +
+                '<td>' + registryCellHtml(row.dateCreated) + '</td>' +
                 '<td class="text-center"><div class="sappc-icon-action_group">' +
                 '<a href="#" class="sappc-icon-action sappc-icon-action--view" title="' + viewLabel + '" aria-label="' + viewLabel + '" data-record-id="' +
                 esc(row.recordId) +
@@ -415,10 +510,6 @@
                 ph('#cnAppPageNo', 'e.g. 12');
                 ph('#cnAppRegistryNo', 'e.g. 45');
                 ph('#cnAppConfMinister', 'Rev. name (optional)');
-                ph('#cnAppGp1', 'Juan D. Cruz');
-                ph('#cnAppGp2', 'Juan D. Cruz');
-                ph('#cnAppGp3', 'Juan D. Cruz');
-                ph('#cnAppGp4', 'Juan D. Cruz');
                 ph('#cnCertChildFirst', 'Juan');
                 ph('#cnCertChildMiddle', 'D.');
                 ph('#cnCertChildLast', 'Cruz');
@@ -433,6 +524,119 @@
                 ph('#cnCertSponsors', 'Juan D. Cruz; Maria D. Cruz');
                 ph('#cnCertPurpose', 'e.g. school enrollment, passport');
             })();
+
+            var confirmationGodparentInitialRows = 2;
+            var confirmationGodparentMaxRows = 26;
+            var confirmationGodparentRowCount = 0;
+
+            function updateConfirmationGodparentToolbarBtns() {
+                $('#cnAppGpAddBtn').prop('disabled', confirmationGodparentRowCount >= confirmationGodparentMaxRows);
+                $('#cnAppGpDeleteBtn').prop('disabled', confirmationGodparentRowCount <= 1);
+            }
+
+            function appendConfirmationGodparentRow() {
+                if (confirmationGodparentRowCount >= confirmationGodparentMaxRows) {
+                    updateConfirmationGodparentToolbarBtns();
+                    return;
+                }
+                confirmationGodparentRowCount += 1;
+                var g = confirmationGodparentRowCount;
+                var $colA = $('#cnAppGpColA');
+                var $colB = $('#cnAppGpColB');
+                if (!$colA.length || !$colB.length) {
+                    return;
+                }
+                $('<input/>', {
+                    type: 'text',
+                    class: 'sappcCnAppIn',
+                    name: 'godparent_' + g + 'a',
+                    id: 'cnAppGp' + g + 'a',
+                    'aria-label': 'Maninoy ' + g,
+                    placeholder: 'Juan D. Cruz',
+                }).appendTo($colA);
+                $('<input/>', {
+                    type: 'text',
+                    class: 'sappcCnAppIn',
+                    name: 'godparent_' + g + 'b',
+                    id: 'cnAppGp' + g + 'b',
+                    'aria-label': 'Maninay ' + g,
+                    placeholder: 'Maria D. Cruz',
+                }).appendTo($colB);
+                updateConfirmationGodparentToolbarBtns();
+            }
+
+            function removeConfirmationGodparentRow() {
+                if (confirmationGodparentRowCount <= 1) {
+                    updateConfirmationGodparentToolbarBtns();
+                    return;
+                }
+                $('#cnAppGpColA').children().last().remove();
+                $('#cnAppGpColB').children().last().remove();
+                confirmationGodparentRowCount -= 1;
+                updateConfirmationGodparentToolbarBtns();
+            }
+
+            function ensureConfirmationGodparentRows(minRows) {
+                var max = confirmationGodparentMaxRows;
+                var target = Math.max(1, Math.min(max, parseInt(minRows, 10) || 1));
+                while (confirmationGodparentRowCount < target) {
+                    appendConfirmationGodparentRow();
+                }
+            }
+
+            function resetConfirmationGodparentRows() {
+                $('#cnAppGpColA, #cnAppGpColB').empty();
+                confirmationGodparentRowCount = 0;
+                ensureConfirmationGodparentRows(confirmationGodparentInitialRows);
+            }
+
+            function maxConfirmationGodparentRowFromSnap(snap) {
+                var max = 0;
+                if (!snap || typeof snap !== 'object') {
+                    return 0;
+                }
+                Object.keys(snap).forEach(function(key) {
+                    var m = /^godparent_(\d+)[ab]$/.exec(key);
+                    if (m) {
+                        max = Math.max(max, parseInt(m[1], 10));
+                        return;
+                    }
+                    var legacy = /^godparent_(\d+)$/.exec(key);
+                    if (legacy && snap[key] != null && String(snap[key]).trim() !== '') {
+                        max = Math.max(max, Math.ceil(parseInt(legacy[1], 10) / 2));
+                    }
+                });
+                return max;
+            }
+
+            function normalizeLegacyConfirmationGodparentSnap(snap) {
+                if (!snap || typeof snap !== 'object') {
+                    return snap;
+                }
+                if (snap.godparent_1a != null || snap.godparent_1b != null) {
+                    return snap;
+                }
+                if (snap.godparent_1 == null && snap.godparent_2 == null && snap.godparent_3 == null && snap.godparent_4 == null) {
+                    return snap;
+                }
+                snap.godparent_1a = snap.godparent_1 != null ? snap.godparent_1 : '';
+                snap.godparent_1b = snap.godparent_2 != null ? snap.godparent_2 : '';
+                snap.godparent_2a = snap.godparent_3 != null ? snap.godparent_3 : '';
+                snap.godparent_2b = snap.godparent_4 != null ? snap.godparent_4 : '';
+                return snap;
+            }
+
+            function initConfirmationApplicationGodparentGrid() {
+                resetConfirmationGodparentRows();
+            }
+
+            initConfirmationApplicationGodparentGrid();
+            $(document).on('click', '#cnAppGpAddBtn', function() {
+                appendConfirmationGodparentRow();
+            });
+            $(document).on('click', '#cnAppGpDeleteBtn', function() {
+                removeConfirmationGodparentRow();
+            });
 
             var $panel = $('#confirmationRecordsPanel');
             if (!$panel.length) return;
@@ -764,7 +968,7 @@
                     '<td class="sappcPaymentFeeModalCellNo"></td>' +
                     '<td><input type="text" class="sappcPaymentFeeModalItemInput" name="fee_items[]" value="" aria-label="Fee item"></td>' +
                     '<td><span class="sappc-payment-badge sappc-payment-badge--unpaid sappcPaymentFeeModalStatus sappcPaymentFeeModalStatusUnpaid">Unpaid</span></td>' +
-                    '<td><span class="sappcPaymentFeeModalDatePaid" data-date-paid="">\u2014</span></td>' +
+                    '<td><span class="sappcPaymentFeeModalDatePaid sappc-no-data" data-date-paid="">' + esc(sappcNoData) + '</span></td>' +
                     '<td class="text-center"><div class="sappcPaymentFeeModalActions">' +
                     '<button type="button" class="sappc-payment-badge sappc-payment-badge--paid sappcPaymentFeeModalTogglePaid">Paid</button>' +
                     '<button type="button" class="sappcPaymentFeeModalBtnRemove" aria-label="Remove row">' +
@@ -773,7 +977,7 @@
             }
 
             function formatPaymentFeeDateDisplay(isoYmd) {
-                if (!isoYmd || String(isoYmd).length < 8) return '\u2014';
+                if (!isoYmd || String(isoYmd).length < 8) return sappcNoData;
                 try {
                     var d = new Date(String(isoYmd).slice(0, 10) + 'T12:00:00');
                     if (isNaN(d.getTime())) return String(isoYmd);
@@ -821,17 +1025,17 @@
                     $toggle.removeClass('sappcPaymentFeeModalTogglePaid').addClass('sappcPaymentFeeModalToggleUnpaid').text('Unpaid');
                     if (dateIso) {
                         $date.attr('data-date-paid', dateIso);
-                        $date.text(formatPaymentFeeDateDisplay(dateIso));
+                        $date.removeClass('sappc-no-data').text(formatPaymentFeeDateDisplay(dateIso));
                     } else {
                         var today = new Date().toISOString().slice(0, 10);
                         $date.attr('data-date-paid', today);
-                        $date.text(formatPaymentFeeDateDisplay(today));
+                        $date.removeClass('sappc-no-data').text(formatPaymentFeeDateDisplay(today));
                     }
                 } else {
                     $status.removeClass('sappcPaymentFeeModalStatusPaid').addClass('sappcPaymentFeeModalStatusUnpaid').text('Unpaid');
                     $toggle.removeClass('sappcPaymentFeeModalToggleUnpaid').addClass('sappcPaymentFeeModalTogglePaid').text('Paid');
                     $date.removeAttr('data-date-paid');
-                    $date.text('\u2014');
+                    $date.addClass('sappc-no-data').text(sappcNoData);
                 }
                 syncConfirmationPaymentFeeRowBadgeColors($tr);
                 return $tr;
@@ -920,13 +1124,13 @@
                     $status.removeClass('sappcPaymentFeeModalStatusPaid').addClass('sappcPaymentFeeModalStatusUnpaid').text('Unpaid');
                     $btn.removeClass('sappcPaymentFeeModalToggleUnpaid').addClass('sappcPaymentFeeModalTogglePaid').text('Paid');
                     $date.removeAttr('data-date-paid');
-                    $date.text('\u2014');
+                    $date.addClass('sappc-no-data').text(sappcNoData);
                 } else {
                     var iso = new Date().toISOString().slice(0, 10);
                     $status.addClass('sappcPaymentFeeModalStatusPaid').removeClass('sappcPaymentFeeModalStatusUnpaid').text('Paid');
                     $btn.removeClass('sappcPaymentFeeModalTogglePaid').addClass('sappcPaymentFeeModalToggleUnpaid').text('Unpaid');
                     $date.attr('data-date-paid', iso);
-                    $date.text(formatPaymentFeeDateDisplay(iso));
+                    $date.removeClass('sappc-no-data').text(formatPaymentFeeDateDisplay(iso));
                 }
                 syncConfirmationPaymentFeeRowBadgeColors($row);
             });
@@ -936,6 +1140,7 @@
 
                 $paymentModal.on('shown.bs.modal', function() {
                     $paymentBtn.attr('aria-expanded', 'true');
+                    applyConfirmationRegistryTopFieldsFromSelectedRow();
                     syncAllConfirmationPaymentFeeRowBadgeColors();
                 });
                 $paymentModal.on('hidden.bs.modal', function() {
@@ -968,6 +1173,7 @@
                         .done(function(res) {
                             if (res && res.ok && res.data) {
                                 applyConfirmationPaymentFeeFormObject(res.data);
+                                applyConfirmationRegistryTopFieldsFromSelectedRow();
                                 paymentBsModal.show();
                             }
                         })
@@ -1136,11 +1342,21 @@
                     registry_no: 1,
                     confirmation_date: 1,
                     confirmation_minister: 1,
-                    godparent_1: 1,
-                    godparent_2: 1,
-                    godparent_3: 1,
-                    godparent_4: 1,
                 };
+
+                function pickApplicationFields(src) {
+                    var o = pickFields(src, applicationFieldNames);
+                    if (!src || typeof src !== 'object') {
+                        return o;
+                    }
+                    Object.keys(src).forEach(function(k) {
+                        if (/^godparent_\d+[ab]$/.test(k)) {
+                            o[k] = src[k];
+                        }
+                    });
+                    return o;
+                }
+
                 var arancelFieldNames = {
                     amt_arancel: 1,
                     amt_candle: 1,
@@ -1212,6 +1428,7 @@
                             $(this).val('');
                         }
                     });
+                    resetConfirmationGodparentRows();
                     updateConfirmationArancelTotal();
                 }
 
@@ -1268,6 +1485,15 @@
                         return;
                     }
                     clearConfirmationApplicationFormFields();
+                    snap = normalizeLegacyConfirmationGodparentSnap(snap);
+                    var gpNeeded = Math.max(confirmationGodparentInitialRows, maxConfirmationGodparentRowFromSnap(snap));
+                    if (gpNeeded > confirmationGodparentRowCount) {
+                        ensureConfirmationGodparentRows(gpNeeded);
+                    } else if (gpNeeded < confirmationGodparentRowCount) {
+                        while (confirmationGodparentRowCount > gpNeeded) {
+                            removeConfirmationGodparentRow();
+                        }
+                    }
                     $.each(snap, function(key, val) {
                         var $fields = $form.find('[name]').filter(function() {
                             return $(this).attr('name') === key;
@@ -1487,7 +1713,7 @@
                             payload[n] = field.value;
                         }
                     });
-                    var pApp = pickFields(payload, applicationFieldNames);
+                    var pApp = pickApplicationFields(payload);
                     var pAr = pickFields(payload, arancelFieldNames);
                     if (wn > 0) {
                         pApp.confirmation_id = wn;
@@ -1671,6 +1897,7 @@
                             if (pay && pay.ok && pay.data) {
                                 applyConfirmationCertificationTopFromPayment(pay.data);
                             }
+                            applyConfirmationRegistryTopFieldsFromSelectedRow();
                             if (cert && cert.ok && cert.data) {
                                 applyConfirmationCertificationFromDetails(cert.data);
                             }
@@ -1720,6 +1947,7 @@
 
                 $certModal.on('shown.bs.modal', function() {
                     $certBtn.attr('aria-expanded', 'true');
+                    applyConfirmationRegistryTopFieldsFromSelectedRow();
                 });
                 $certModal.on('hidden.bs.modal', function() {
                     $certBtn.attr('aria-expanded', 'false');
@@ -2040,24 +2268,27 @@
                     return;
                 }
                 setSelectedConfirmationId($tr.attr('data-record-id') || '');
+                var rowMeta = registryRowMetaFromTr($tr);
+                if (activeSection === 'payment' || activeSection === 'certification') {
+                    applyConfirmationRegistryTopFields(rowMeta);
+                    return;
+                }
                 if (activeSection !== 'schedule' || !$scheduleForm.length) {
                     return;
                 }
                 var $tds = $tr.find('td');
                 if ($tds.length < 6) return;
-                $('#cnScheduleRefCode').val(($tds.eq(1).text() || '').trim());
-                $('#cnScheduleClient').val(($tds.eq(2).text() || '').trim());
-                $('#cnScheduleAddress').val(($tds.eq(3).text() || '').trim());
-                var rawSex = ($tds.eq(4).text() || '').trim();
-                if (rawSex === '\u2014' || rawSex === '-' || rawSex === '') {
-                    $('#cnScheduleSex').val('');
+                if (rowMeta) {
+                    applyConfirmationRegistryTopFields(rowMeta);
                 } else {
-                    $('#cnScheduleSex').val(rawSex);
+                    $('#cnScheduleRefCode').val(($tds.eq(1).text() || '').trim());
+                    $('#cnScheduleClient').val(($tds.eq(2).text() || '').trim());
+                    $('#cnScheduleAddress').val(($tds.eq(3).text() || '').trim());
+                    var rawContact = ($tds.eq(4).text() || '').trim();
+                    $('#cnScheduleContact').val(
+                        isEmptyDisplayValue(rawContact) ? '' : formatPhMobileDisplay(rawContact)
+                    );
                 }
-                var rawContact = ($tds.eq(5).text() || '').trim();
-                $('#cnScheduleContact').val(
-                    (rawContact === '\u2014' || rawContact === '-' || rawContact === '') ? '' : formatPhMobileDisplay(rawContact)
-                );
             });
 
             if ($scheduleForm.length && scheduleSaveUrl) {

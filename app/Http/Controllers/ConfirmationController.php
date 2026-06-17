@@ -23,6 +23,8 @@ class ConfirmationController extends Controller
 
     private const CONFIRMATION_REFERENCE_CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
+    private const CONFIRMATION_GODPARENT_FORM_ROWS = 26;
+
     public function index(Request $request)
     {
         return redirect()->route('admin.confirmation.application', $request->query());
@@ -833,12 +835,33 @@ class ConfirmationController extends Controller
             $data['page_no'] = (string) ($details->pageNo ?? '');
             $data['priest'] = ClientNameDisplay::formatPriestName((string) ($details->confirmationMinister ?? ''));
 
-            $sponsors = array_values(array_filter([
-                trim((string) ($details->godparent1 ?? '')),
-                trim((string) ($details->godparent2 ?? '')),
-                trim((string) ($details->godparent3 ?? '')),
-                trim((string) ($details->godparent4 ?? '')),
-            ], fn ($s) => $s !== ''));
+            $sponsors = [];
+            if (! empty($details->godparents)) {
+                $decoded = json_decode((string) $details->godparents, true);
+                if (is_array($decoded)) {
+                    foreach ($decoded as $pair) {
+                        if (! is_array($pair)) {
+                            continue;
+                        }
+                        $maninoy = trim((string) ($pair['maninoy'] ?? $pair[0] ?? ''));
+                        $maninay = trim((string) ($pair['maninay'] ?? $pair[1] ?? ''));
+                        if ($maninoy !== '') {
+                            $sponsors[] = $maninoy;
+                        }
+                        if ($maninay !== '') {
+                            $sponsors[] = $maninay;
+                        }
+                    }
+                }
+            }
+            if ($sponsors === []) {
+                $sponsors = array_values(array_filter([
+                    trim((string) ($details->godparent1 ?? '')),
+                    trim((string) ($details->godparent2 ?? '')),
+                    trim((string) ($details->godparent3 ?? '')),
+                    trim((string) ($details->godparent4 ?? '')),
+                ], fn ($s) => $s !== ''));
+            }
             $data['sponsors'] = implode('; ', $sponsors);
         }
 
@@ -960,11 +983,11 @@ class ConfirmationController extends Controller
             'registry_no' => '',
             'confirmation_date' => '',
             'confirmation_minister' => '',
-            'godparent_1' => '',
-            'godparent_2' => '',
-            'godparent_3' => '',
-            'godparent_4' => '',
         ];
+        for ($g = 1; $g <= self::CONFIRMATION_GODPARENT_FORM_ROWS; $g++) {
+            $defaults['godparent_'.$g.'a'] = '';
+            $defaults['godparent_'.$g.'b'] = '';
+        }
         if ($row === null) {
             return $defaults;
         }
@@ -985,10 +1008,29 @@ class ConfirmationController extends Controller
         $defaults['registry_no'] = (string) ($row->registryNo ?? '');
         $defaults['confirmation_date'] = $this->dateForForm($row->confirmationDate ?? null);
         $defaults['confirmation_minister'] = ClientNameDisplay::formatPriestName((string) ($row->confirmationMinister ?? ''));
-        $defaults['godparent_1'] = (string) ($row->godparent1 ?? '');
-        $defaults['godparent_2'] = (string) ($row->godparent2 ?? '');
-        $defaults['godparent_3'] = (string) ($row->godparent3 ?? '');
-        $defaults['godparent_4'] = (string) ($row->godparent4 ?? '');
+
+        if (! empty($row->godparents)) {
+            $decoded = json_decode((string) $row->godparents, true);
+            if (is_array($decoded)) {
+                $i = 1;
+                foreach ($decoded as $pair) {
+                    if ($i > self::CONFIRMATION_GODPARENT_FORM_ROWS) {
+                        break;
+                    }
+                    if (! is_array($pair)) {
+                        continue;
+                    }
+                    $defaults['godparent_'.$i.'a'] = (string) ($pair['maninoy'] ?? $pair[0] ?? '');
+                    $defaults['godparent_'.$i.'b'] = (string) ($pair['maninay'] ?? $pair[1] ?? '');
+                    $i++;
+                }
+            }
+        } else {
+            $defaults['godparent_1a'] = (string) ($row->godparent1 ?? '');
+            $defaults['godparent_1b'] = (string) ($row->godparent2 ?? '');
+            $defaults['godparent_2a'] = (string) ($row->godparent3 ?? '');
+            $defaults['godparent_2b'] = (string) ($row->godparent4 ?? '');
+        }
 
         return ClientNameDisplay::normalizeApplicationNameFields($defaults);
     }
@@ -1062,6 +1104,58 @@ class ConfirmationController extends Controller
         }
     }
 
+    private function confirmationGodparentsFromApplicationPayload(array $payload): ?array
+    {
+        $hasAny = false;
+        for ($i = 1; $i <= self::CONFIRMATION_GODPARENT_FORM_ROWS; $i++) {
+            if (array_key_exists('godparent_'.$i.'a', $payload) || array_key_exists('godparent_'.$i.'b', $payload)) {
+                $hasAny = true;
+                break;
+            }
+        }
+        if (! $hasAny) {
+            for ($i = 1; $i <= 4; $i++) {
+                if (array_key_exists('godparent_'.$i, $payload)) {
+                    $hasAny = true;
+                    break;
+                }
+            }
+        }
+        if (! $hasAny) {
+            return null;
+        }
+
+        $godparents = [];
+        for ($i = 1; $i <= self::CONFIRMATION_GODPARENT_FORM_ROWS; $i++) {
+            $aKey = 'godparent_'.$i.'a';
+            $bKey = 'godparent_'.$i.'b';
+            if (! array_key_exists($aKey, $payload) && ! array_key_exists($bKey, $payload)) {
+                break;
+            }
+            $a = ClientNameDisplay::nullableFormattedFamilyName(is_string($payload[$aKey] ?? null) ? trim((string) $payload[$aKey]) : '');
+            $b = ClientNameDisplay::nullableFormattedFamilyName(is_string($payload[$bKey] ?? null) ? trim((string) $payload[$bKey]) : '');
+            if ($a !== null || $b !== null) {
+                $godparents[] = ['maninoy' => $a ?? '', 'maninay' => $b ?? ''];
+            }
+        }
+
+        if ($godparents === []) {
+            $legacyPairs = [
+                ['maninoy' => $payload['godparent_1'] ?? '', 'maninay' => $payload['godparent_2'] ?? ''],
+                ['maninoy' => $payload['godparent_3'] ?? '', 'maninay' => $payload['godparent_4'] ?? ''],
+            ];
+            foreach ($legacyPairs as $pair) {
+                $a = ClientNameDisplay::nullableFormattedFamilyName(trim((string) ($pair['maninoy'] ?? '')));
+                $b = ClientNameDisplay::nullableFormattedFamilyName(trim((string) ($pair['maninay'] ?? '')));
+                if ($a !== null || $b !== null) {
+                    $godparents[] = ['maninoy' => $a ?? '', 'maninay' => $b ?? ''];
+                }
+            }
+        }
+
+        return $godparents;
+    }
+
     private function syncConfirmationDetailsFromApplicationPayload(int $confirmationId, array $payload): void
     {
         if (! $this->confirmationDetailsTableExists()) {
@@ -1117,17 +1211,14 @@ class ConfirmationController extends Controller
         if (array_key_exists('confirmation_minister', $payload)) {
             $row['confirmationMinister'] = ClientNameDisplay::nullableFormattedPriest($payload['confirmation_minister']);
         }
-        if (array_key_exists('godparent_1', $payload)) {
-            $row['godparent1'] = $this->nullableText($payload['godparent_1']);
-        }
-        if (array_key_exists('godparent_2', $payload)) {
-            $row['godparent2'] = $this->nullableText($payload['godparent_2']);
-        }
-        if (array_key_exists('godparent_3', $payload)) {
-            $row['godparent3'] = $this->nullableText($payload['godparent_3']);
-        }
-        if (array_key_exists('godparent_4', $payload)) {
-            $row['godparent4'] = $this->nullableText($payload['godparent_4']);
+
+        $godparents = $this->confirmationGodparentsFromApplicationPayload($payload);
+        if ($godparents !== null) {
+            $row['godparents'] = count($godparents) ? json_encode($godparents, JSON_UNESCAPED_UNICODE) : null;
+            $row['godparent1'] = $godparents[0]['maninoy'] ?? null;
+            $row['godparent2'] = $godparents[0]['maninay'] ?? null;
+            $row['godparent3'] = $godparents[1]['maninoy'] ?? null;
+            $row['godparent4'] = $godparents[1]['maninay'] ?? null;
         }
 
         if ($row === []) {

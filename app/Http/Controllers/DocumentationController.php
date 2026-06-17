@@ -112,10 +112,10 @@ class DocumentationController extends Controller
                     $r->clientFName ?? null,
                     $r->clientMName ?? null,
                     $r->clientLName ?? null
-                ) ?: '—',
-                'address' => ($r->address ?? '') !== '' ? ClientNameDisplay::formatAddress((string) $r->address) : '—',
-                'sex' => ($r->sex ?? '') !== '' ? (string) $r->sex : '—',
-                'contact_number' => ($r->contactNum ?? '') !== '' ? (string) $r->contactNum : '—',
+                ) ?: ClientNameDisplay::EMPTY_DISPLAY,
+                'address' => ($r->address ?? '') !== '' ? ClientNameDisplay::formatAddress((string) $r->address) : ClientNameDisplay::EMPTY_DISPLAY,
+                'sex' => ($r->sex ?? '') !== '' ? (string) $r->sex : ClientNameDisplay::EMPTY_DISPLAY,
+                'contact_number' => ($r->contactNum ?? '') !== '' ? (string) $r->contactNum : ClientNameDisplay::EMPTY_DISPLAY,
                 'date' => ClientNameDisplay::formatDateCreated($r->dateCreated ?? null),
             ];
         }
