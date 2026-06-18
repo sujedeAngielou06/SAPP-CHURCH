@@ -6,7 +6,9 @@ use App\Support\ClientNameDisplay;
 use App\Support\DocumentationApplicationReportWriter;
 use App\Support\SacramentApplicationGate;
 use App\Support\SacramentReferenceCode;
+use App\Support\SacramentRegistryContactOverlay;
 use App\Support\SacramentRegistrySectionFilter;
+use App\Support\SacramentRegistryWorkflowHeaderSeed;
 use App\Support\SacramentScheduleReservedDates;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
@@ -429,10 +431,6 @@ class ChristeningController extends Controller
             ], 404);
         }
 
-        if (! SacramentApplicationGate::christeningIsCertificationSaved($christeningId)) {
-            return SacramentApplicationGate::certificationDenyResponse();
-        }
-
         $client = ClientNameDisplay::fullDisplayName(
             $row->clientFName ?? null,
             $row->clientMName ?? null,
@@ -452,18 +450,24 @@ class ChristeningController extends Controller
             }
         }
 
+        $data = [
+            'christening_id' => $christeningId,
+            'reference_code' => (string) ($row->referenceCode ?? ''),
+            'client' => $client,
+            'address' => ClientNameDisplay::formatAddress((string) ($row->address ?? '')),
+            'sex' => (string) ($row->sex ?? ''),
+            'contact_number' => (string) ($row->contactNum ?? ''),
+            'schedule_date' => $scheduleDate,
+            'schedule_time' => $scheduleTime,
+        ];
+        $data = SacramentRegistryContactOverlay::mergeEmptyFields(
+            $data,
+            $this->christeningContactOverlayFromApplication($christeningId)
+        );
+
         return response()->json([
             'ok' => true,
-            'data' => [
-                'christening_id' => $christeningId,
-                'reference_code' => (string) ($row->referenceCode ?? ''),
-                'client' => $client,
-                'address' => ClientNameDisplay::formatAddress((string) ($row->address ?? '')),
-                'sex' => (string) ($row->sex ?? ''),
-                'contact_number' => (string) ($row->contactNum ?? ''),
-                'schedule_date' => $scheduleDate,
-                'schedule_time' => $scheduleTime,
-            ],
+            'data' => $data,
         ]);
     }
 
@@ -576,6 +580,16 @@ class ChristeningController extends Controller
                     'contactNum' => $this->nullableText($request->input('guardian_contact')),
                     'address' => ClientNameDisplay::nullableFormattedAddress($request->input('parent_address')),
                 ];
+                $registryRow = DB::table('christening')->where('christeningId', $christeningId)->first();
+                if ($registryRow !== null && Schema::hasColumn('christening', 'paymentFeeRows')) {
+                    $rawFee = $registryRow->paymentFeeRows ?? null;
+                    if ($rawFee === null || trim((string) $rawFee) === '' || trim((string) $rawFee) === '[]') {
+                        $encoded = json_encode($this->defaultChristeningPaymentFeeRows(), JSON_UNESCAPED_UNICODE);
+                        if ($encoded !== false) {
+                            $headerUpdate['paymentFeeRows'] = $encoded;
+                        }
+                    }
+                }
                 if (Schema::hasColumn('christening', 'applicationCompletedAt')) {
                     $headerUpdate['applicationCompletedAt'] = now();
                 }
@@ -604,6 +618,11 @@ class ChristeningController extends Controller
                 'message' => 'Could not save the application. Please try again.',
             ], 422);
         }
+
+        SacramentRegistryWorkflowHeaderSeed::afterApplicationSave(
+            SacramentRegistryWorkflowHeaderSeed::CHRISTENING,
+            $christeningId
+        );
 
         DocumentationApplicationReportWriter::syncChristening(
             $christeningId,
@@ -797,10 +816,16 @@ class ChristeningController extends Controller
         $this->ensureChristeningReferenceCode($christeningId);
         $row = DB::table('christening')->where('christeningId', $christeningId)->first();
 
+        $data = $this->mapChristeningRowToPaymentFormFields($row);
+        $data = SacramentRegistryContactOverlay::mergeEmptyFields(
+            $data,
+            $this->christeningContactOverlayFromApplication($christeningId)
+        );
+
         return response()->json([
             'ok' => true,
             'payment_complete' => SacramentApplicationGate::christeningIsPaymentComplete($christeningId),
-            'data' => $this->mapChristeningRowToPaymentFormFields($row),
+            'data' => $data,
         ]);
     }
 
@@ -1788,6 +1813,33 @@ class ChristeningController extends Controller
             'date' => $resolvedDate,
             'created_at' => now(),
             'updated_at' => now(),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function christeningContactOverlayFromApplication(int $christeningId): array
+    {
+        try {
+            $details = DB::table('christening_details')
+                ->where('christeningId', $christeningId)
+                ->orderByDesc('christeningDetailsId')
+                ->first();
+        } catch (QueryException) {
+            return [];
+        }
+
+        if ($details === null) {
+            return [];
+        }
+
+        $app = $this->mapChristeningDetailsRowToFormFields($details);
+
+        return [
+            'client' => SacramentRegistryContactOverlay::clientFromNameParts($app),
+            'contact_number' => trim((string) ($app['guardian_contact'] ?? '')),
+            'address' => trim((string) ($app['parent_address'] ?? '')),
         ];
     }
 

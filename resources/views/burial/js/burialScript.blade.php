@@ -2,6 +2,7 @@
     $initialTablePayload = $initialTablePayload ?? null;
     $activeSection = $activeSection ?? 'schedule';
 @endphp
+@include('partials.sappcRegistryApplicationOverlayScript')
 <script>
     (function() {
         'use strict';
@@ -15,7 +16,7 @@
                 return window.sappcIsEmptyDisplayValue(v);
             }
             var s = String(v == null ? '' : v).trim();
-            return !s || s === '\u2014' || s === '-' || s.toLowerCase() === sappcNoData.toLowerCase();
+            return !s || s === '\u2014' || s === '-' || s.toLowerCase() === sappcNoData.toLowerCase(); 
         }
 
         function emptyDisplayHtml() {
@@ -59,6 +60,42 @@
             if ($('#brScheduleBurialId').length) {
                 $('#brScheduleBurialId').val(id);
             }
+        }
+
+        var brApplicationSnapsByBurialId = {};
+
+        function mergeBurialPaymentDataFromApplicationDraft(cid, data) {
+            if (!data || typeof data !== 'object') {
+                return data;
+            }
+            var appSnap = brApplicationSnapsByBurialId[String(cid)];
+            if (!appSnap || typeof window.sappcRegistryTopFromBurialApplicationSnap !== 'function') {
+                return data;
+            }
+            return window.sappcMergeRegistryTopEmpty(
+                data,
+                window.sappcRegistryTopFromBurialApplicationSnap(appSnap)
+            );
+        }
+
+        function overlayBurialScheduleTopFromApplicationDraft(cid) {
+            if (!cid || typeof window.sappcRegistryTopFromBurialApplicationSnap !== 'function') {
+                return;
+            }
+            var appSnap = brApplicationSnapsByBurialId[String(cid)];
+            if (!appSnap) {
+                return;
+            }
+            var merged = window.sappcMergeRegistryTopEmpty({
+                client: ($('#brScheduleClient').val() || '').trim(),
+                contact_number: sappcPhMobileDigitsOnly($('#brScheduleContact').val()),
+                address: ($('#brScheduleAddress').val() || '').trim()
+            }, window.sappcRegistryTopFromBurialApplicationSnap(appSnap));
+            $('#brScheduleClient').val(merged.client || '');
+            $('#brScheduleContact').val(
+                merged.contact_number ? formatPhMobileDisplay(String(merged.contact_number)) : ''
+            );
+            $('#brScheduleAddress').val(merged.address || '');
         }
 
         function registryRowMetaFromTr($tr) {
@@ -162,11 +199,8 @@
                 var q = u.searchParams.toString();
                 window.history.replaceState({}, '', u.pathname + (q ? '?' + q : '') + u.hash);
                 setTimeout(function() {
-                    if (typeof window.sappcRegistryWorkflowOpenRecord === 'function') {
-                        window.sappcRegistryWorkflowOpenRecord(id);
-                        return;
-                    }
                     setSelectedBurialId(id);
+                    $('#brAppBurialId').val(id);
                     $('#burialTableBody tr.is-schedule-selected').removeClass('is-schedule-selected');
                     $('#burialTableBody tr').each(function() {
                         if (($(this).attr('data-record-id') || '').trim() === id) {
@@ -771,7 +805,9 @@
                 var href = $(this).attr('href');
                 ensureRegistryWorkflowStep(step, cid, function(ok) {
                     if (ok && href) {
-                        window.location.href = href;
+                        window.location.href = typeof window.sappcRegistryWorkflowUrlWithRecord === 'function'
+                            ? window.sappcRegistryWorkflowUrlWithRecord(href, cid)
+                            : href;
                     }
                 });
             });
@@ -1030,7 +1066,9 @@
                     }), jsonHeaders)
                         .done(function(res) {
                             if (res && res.ok && res.data) {
-                                applyConfirmationPaymentFeeFormObject(res.data);
+                                applyConfirmationPaymentFeeFormObject(
+                                    mergeBurialPaymentDataFromApplicationDraft(cid, res.data)
+                                );
                                 applyBurialRegistryTopFieldsFromSelectedRow();
                                 paymentBsModal.show();
                             }
@@ -2020,6 +2058,7 @@
                             .done(function(res) {
                                 if (res && res.ok && res.data) {
                                     applyBurialScheduleDetailsToForm(res.data);
+                                    overlayBurialScheduleTopFromApplicationDraft(cid);
                                 }
                             })
                             .fail(function(xhr) {
@@ -2176,6 +2215,10 @@
                     if (!data || typeof data !== 'object') {
                         return;
                     }
+                    var bid = ($('#brAppBurialId').val() || '').trim() || getSelectedBurialId();
+                    if (bid) {
+                        brApplicationSnapsByBurialId[String(bid)] = Object.assign({}, data);
+                    }
                     var $f = $burialAppForm;
                     if ($f[0]) {
                         $f[0].reset();
@@ -2303,6 +2346,7 @@
                     if (n > 0) {
                         payload.burial_id = n;
                     }
+                    brApplicationSnapsByBurialId[n > 0 ? String(n) : '_none'] = Object.assign({}, payload);
                     var $saveBtn = $('#burialApplicationFormSaveBtn');
                     var bsModal = bootstrap.Modal.getOrCreateInstance($burialAppModal[0]);
                     $saveBtn.prop('disabled', true);
@@ -2315,6 +2359,7 @@
                                 if (savedId) {
                                     setSelectedBurialId(savedId);
                                     $('#brAppBurialId').val(savedId);
+                                    brApplicationSnapsByBurialId[savedId] = Object.assign({}, payload);
                                     if (typeof fetchRecords === 'function') {
                                         fetchRecords();
                                     }

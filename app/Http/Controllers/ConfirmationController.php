@@ -6,7 +6,9 @@ use App\Support\ClientNameDisplay;
 use App\Support\DocumentationApplicationReportWriter;
 use App\Support\SacramentApplicationGate;
 use App\Support\SacramentReferenceCode;
+use App\Support\SacramentRegistryContactOverlay;
 use App\Support\SacramentRegistrySectionFilter;
+use App\Support\SacramentRegistryWorkflowHeaderSeed;
 use App\Support\SacramentScheduleReservedDates;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
@@ -309,18 +311,24 @@ class ConfirmationController extends Controller
             }
         }
 
+        $data = [
+            'confirmation_id' => $confirmationId,
+            'reference_code' => (string) ($row->referenceCode ?? ''),
+            'client' => $client,
+            'address' => ClientNameDisplay::formatAddress((string) ($row->address ?? '')),
+            'sex' => (string) ($row->sex ?? ''),
+            'contact_number' => (string) ($row->contactNum ?? ''),
+            'schedule_date' => $scheduleDate,
+            'schedule_time' => $scheduleTime,
+        ];
+        $data = SacramentRegistryContactOverlay::mergeEmptyFields(
+            $data,
+            $this->confirmationContactOverlayFromApplication($row)
+        );
+
         return response()->json([
             'ok' => true,
-            'data' => [
-                'confirmation_id' => $confirmationId,
-                'reference_code' => (string) ($row->referenceCode ?? ''),
-                'client' => $client,
-                'address' => ClientNameDisplay::formatAddress((string) ($row->address ?? '')),
-                'sex' => (string) ($row->sex ?? ''),
-                'contact_number' => (string) ($row->contactNum ?? ''),
-                'schedule_date' => $scheduleDate,
-                'schedule_time' => $scheduleTime,
-            ],
+            'data' => $data,
         ]);
     }
 
@@ -358,10 +366,16 @@ class ConfirmationController extends Controller
         $this->ensureConfirmationReferenceCode($confirmationId);
         $row = DB::table('confirmation')->where('confirmationId', $confirmationId)->first();
 
+        $data = $this->mapConfirmationRowToPaymentFormFields($row);
+        $data = SacramentRegistryContactOverlay::mergeEmptyFields(
+            $data,
+            $this->confirmationContactOverlayFromApplication($row)
+        );
+
         return response()->json([
             'ok' => true,
             'payment_complete' => SacramentApplicationGate::confirmationIsPaymentComplete($confirmationId),
-            'data' => $this->mapConfirmationRowToPaymentFormFields($row),
+            'data' => $data,
         ]);
     }
 
@@ -668,12 +682,26 @@ class ConfirmationController extends Controller
                 'clientMName' => $middleName !== '' ? $middleName : null,
                 'clientLName' => $familyName,
                 'confirmationApplication' => $encoded,
+                'address' => ClientNameDisplay::nullableFormattedAddress($data['address'] ?? null),
             ];
+            if (! empty($data['contact_number'])) {
+                $headerUpdate['contactNum'] = $this->nullableText($data['contact_number']);
+            }
             if (Schema::hasColumn('confirmation', 'applicationCompletedAt')) {
                 $headerUpdate['applicationCompletedAt'] = now();
             }
             if (Schema::hasColumn('confirmation', 'workflowStep')) {
                 $headerUpdate['workflowStep'] = SacramentRegistrySectionFilter::SECTION_APPLICATION;
+            }
+            $registryRow = DB::table('confirmation')->where('confirmationId', $id)->first();
+            if ($registryRow !== null && Schema::hasColumn('confirmation', 'paymentFeeRows')) {
+                $rawFee = $registryRow->paymentFeeRows ?? null;
+                if ($rawFee === null || trim((string) $rawFee) === '' || trim((string) $rawFee) === '[]') {
+                    $encodedFee = json_encode($this->defaultConfirmationPaymentFeeRows(), JSON_UNESCAPED_UNICODE);
+                    if ($encodedFee !== false) {
+                        $headerUpdate['paymentFeeRows'] = $encodedFee;
+                    }
+                }
             }
             DB::table('confirmation')->where('confirmationId', $id)->update($headerUpdate);
             $this->syncConfirmationDetailsFromApplicationPayload($id, $data);
@@ -687,6 +715,11 @@ class ConfirmationController extends Controller
         }
 
         DocumentationApplicationReportWriter::syncConfirmation($id, $data);
+
+        SacramentRegistryWorkflowHeaderSeed::afterApplicationSave(
+            SacramentRegistryWorkflowHeaderSeed::CONFIRMATION,
+            $id
+        );
 
         return response()->json([
             'ok' => true,
@@ -1495,6 +1528,23 @@ class ConfirmationController extends Controller
 
             return [$id, $ref];
         });
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function confirmationContactOverlayFromApplication(object $row): array
+    {
+        $id = (int) $row->confirmationId;
+        $details = $this->latestConfirmationDetailsRow($id);
+        $data = $this->mapConfirmationDetailsRowToApplicationForm($details);
+        $this->overlayNonEmptyJsonFields($data, $this->decodeConfirmationJsonColumn($row, 'confirmationApplication'));
+
+        return [
+            'client' => SacramentRegistryContactOverlay::clientFromNameParts($data),
+            'contact_number' => trim((string) ($data['contact_number'] ?? $data['guardian_contact'] ?? '')),
+            'address' => trim((string) ($data['address'] ?? '')),
+        ];
     }
 
     private function ensureConfirmationReferenceCode(int $confirmationId): string

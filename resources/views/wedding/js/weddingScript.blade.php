@@ -2,6 +2,7 @@
     $initialTablePayload = $initialTablePayload ?? null;
     $activeSection = $activeSection ?? 'schedule';
 @endphp
+@include('partials.sappcRegistryApplicationOverlayScript')
 <script>
     (function() {
         'use strict';
@@ -59,6 +60,42 @@
             if ($('#wdScheduleWeddingId').length) {
                 $('#wdScheduleWeddingId').val(id);
             }
+        }
+
+        var wdMarriageApplicationSnapsByWeddingId = {};
+
+        function mergeWeddingPaymentDataFromApplicationDraft(cid, data) {
+            if (!data || typeof data !== 'object') {
+                return data;
+            }
+            var appSnap = wdMarriageApplicationSnapsByWeddingId[String(cid)];
+            if (!appSnap || typeof window.sappcRegistryTopFromWeddingApplicationSnap !== 'function') {
+                return data;
+            }
+            return window.sappcMergeRegistryTopEmpty(
+                data,
+                window.sappcRegistryTopFromWeddingApplicationSnap(appSnap)
+            );
+        }
+
+        function overlayWeddingScheduleTopFromApplicationDraft(cid) {
+            if (!cid || typeof window.sappcRegistryTopFromWeddingApplicationSnap !== 'function') {
+                return;
+            }
+            var appSnap = wdMarriageApplicationSnapsByWeddingId[String(cid)];
+            if (!appSnap) {
+                return;
+            }
+            var merged = window.sappcMergeRegistryTopEmpty({
+                client: ($('#wdScheduleClient').val() || '').trim(),
+                contact_number: sappcPhMobileDigitsOnly($('#wdScheduleContact').val()),
+                address: ($('#wdScheduleAddress').val() || '').trim()
+            }, window.sappcRegistryTopFromWeddingApplicationSnap(appSnap));
+            $('#wdScheduleClient').val(merged.client || '');
+            $('#wdScheduleContact').val(
+                merged.contact_number ? formatPhMobileDisplay(String(merged.contact_number)) : ''
+            );
+            $('#wdScheduleAddress').val(merged.address || '');
         }
 
         function registryRowMetaFromTr($tr) {
@@ -162,11 +199,8 @@
                 var q = u.searchParams.toString();
                 window.history.replaceState({}, '', u.pathname + (q ? '?' + q : '') + u.hash);
                 setTimeout(function() {
-                    if (typeof window.sappcRegistryWorkflowOpenRecord === 'function') {
-                        window.sappcRegistryWorkflowOpenRecord(id);
-                        return;
-                    }
                     setSelectedWeddingId(id);
+                    $('#wdMarriageAppWeddingId').val(id);
                     $('#weddingTableBody tr.is-schedule-selected').removeClass('is-schedule-selected');
                     $('#weddingTableBody tr').each(function() {
                         if (($(this).attr('data-record-id') || '').trim() === id) {
@@ -882,7 +916,9 @@
                         var href = $(this).attr('href');
                         ensureRegistryWorkflowStep(step, cid, function(ok) {
                             if (ok && href) {
-                                window.location.href = href;
+                                window.location.href = typeof window.sappcRegistryWorkflowUrlWithRecord === 'function'
+                                    ? window.sappcRegistryWorkflowUrlWithRecord(href, cid)
+                                    : href;
                             }
                         });
                     });
@@ -1268,7 +1304,9 @@
                             }), jsonHeaders)
                             .done(function(res) {
                                 if (res && res.ok && res.data) {
-                                    applyConfirmationPaymentFeeFormObject(res.data);
+                                    applyConfirmationPaymentFeeFormObject(
+                                        mergeWeddingPaymentDataFromApplicationDraft(cid, res.data)
+                                    );
                                     applyWeddingRegistryTopFieldsFromSelectedRow();
                                     paymentBsModal.show();
                                 }
@@ -2112,6 +2150,10 @@
 
                 function applyMarriageApplicationData(data) {
                     data = data && typeof data === 'object' ? data : {};
+                    var wid = ($('#wdMarriageAppWeddingId').val() || '').trim() || getSelectedWeddingId();
+                    if (wid) {
+                        wdMarriageApplicationSnapsByWeddingId[String(wid)] = Object.assign({}, data);
+                    }
                     var $f = $marriageAppForm;
                     resetWeddingGodparentRows();
                     var gpNeeded = Math.max(weddingGodparentInitialRows, maxWeddingSponsorRowFromData(data));
@@ -2306,6 +2348,7 @@
                     if (wn > 0) {
                         payload.wedding_id = wn;
                     }
+                    wdMarriageApplicationSnapsByWeddingId[wn > 0 ? String(wn) : '_none'] = Object.assign({}, payload);
                     var $saveBtn = $('#weddingMarriageAppSaveBtn');
                     var marriageBsModal =
                         (typeof bootstrap !== 'undefined' && $marriageAppModal.length) ?
@@ -2345,6 +2388,7 @@
                             if (savedId) {
                                 setSelectedWeddingId(savedId);
                                 $('#wdMarriageAppWeddingId').val(savedId);
+                                wdMarriageApplicationSnapsByWeddingId[savedId] = Object.assign({}, payload);
                                 if (typeof fetchRecords === 'function') {
                                     fetchRecords();
                                 }
@@ -2888,6 +2932,7 @@
                             .done(function(res) {
                                 if (res && res.ok && res.data) {
                                     applyWeddingScheduleDetailsToForm(res.data);
+                                    overlayWeddingScheduleTopFromApplicationDraft(cid);
                                 }
                             })
                             .fail(function(xhr) {

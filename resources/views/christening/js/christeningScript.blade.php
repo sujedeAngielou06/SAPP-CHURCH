@@ -10,6 +10,7 @@
         $chApplicationFormConfig ?? [],
     );
 @endphp
+@include('partials.sappcRegistryApplicationOverlayScript')
 <script>
     (function($) {
         'use strict';
@@ -188,18 +189,7 @@
                 var q = u.searchParams.toString();
                 window.history.replaceState({}, '', u.pathname + (q ? '?' + q : '') + u.hash);
                 setTimeout(function() {
-                    if (typeof window.sappcRegistryWorkflowOpenRecord === 'function') {
-                        window.sappcRegistryWorkflowOpenRecord(id);
-                        return;
-                    }
-                    setSelectedChristeningId(id);
-                    $('#christeningTableBody tr.is-schedule-selected').removeClass('is-schedule-selected');
-                    $('#christeningTableBody tr').each(function() {
-                        if (($(this).attr('data-record-id') || '').trim() === id) {
-                            $(this).addClass('is-schedule-selected');
-                            return false;
-                        }
-                    });
+                    selectChristeningTableRow(id);
                 }, 0);
             } catch (e1) {}
         }
@@ -988,6 +978,57 @@
             }
         }
 
+        function syncChristeningRegistryDraftsFromApplication() {
+            if (typeof window.sappcRegistryTopFromChristeningApplicationSnap !== 'function') {
+                return;
+            }
+            var key = christeningApplicationDraftKey();
+            var overlay = window.sappcRegistryTopFromChristeningApplicationSnap(
+                chApplicationDraftsByChristeningId[key]
+            );
+            if (!overlay) {
+                return;
+            }
+            chPaymentDraftsByChristeningId[key] = window.sappcMergeRegistryTopEmpty(
+                chPaymentDraftsByChristeningId[key] || {},
+                overlay
+            );
+        }
+
+        function mergeChristeningPaymentDataFromApplicationDraft(cid, data) {
+            if (!data || typeof data !== 'object') {
+                return data;
+            }
+            var appSnap = chApplicationDraftsByChristeningId[String(cid)];
+            if (!appSnap || typeof window.sappcRegistryTopFromChristeningApplicationSnap !== 'function') {
+                return data;
+            }
+            return window.sappcMergeRegistryTopEmpty(
+                data,
+                window.sappcRegistryTopFromChristeningApplicationSnap(appSnap)
+            );
+        }
+
+        function overlayChristeningScheduleTopFromApplicationDraft(cid) {
+            if (!cid || typeof window.sappcRegistryTopFromChristeningApplicationSnap !== 'function') {
+                return;
+            }
+            var appSnap = chApplicationDraftsByChristeningId[String(cid)];
+            if (!appSnap) {
+                return;
+            }
+            var merged = window.sappcMergeRegistryTopEmpty({
+                client: ($('#chScheduleClient').val() || '').trim(),
+                contact_number: sappcPhMobileDigitsOnly($('#chScheduleContact').val()),
+                address: ($('#chScheduleAddress').val() || '').trim()
+            }, window.sappcRegistryTopFromChristeningApplicationSnap(appSnap));
+            $('#chScheduleClient').val(merged.client || '');
+            $('#chScheduleContact').val(
+                merged.contact_number ? formatPhMobileDisplay(String(merged.contact_number)) : ''
+            );
+            $('#chScheduleAddress').val(merged.address || '');
+        }
+
         function christeningApplicationDraftKey() {
             var cid = getSelectedChristeningId();
             return cid || '_none';
@@ -1152,6 +1193,8 @@
                             if (savedId) {
                                 setSelectedChristeningId(savedId);
                             }
+                            snapshotChristeningApplicationDraft();
+                            syncChristeningRegistryDraftsFromApplication();
                             if (typeof fetchRecords === 'function') {
                                 fetchRecords();
                             }
@@ -1487,7 +1530,9 @@
                 }), jsonHeaders)
                     .done(function(res) {
                         if (res && res.ok && res.data) {
-                            applyChristeningPaymentFeeFormObject(res.data);
+                            applyChristeningPaymentFeeFormObject(
+                                mergeChristeningPaymentDataFromApplicationDraft(cid, res.data)
+                            );
                             applyChristeningRegistryTopFieldsFromSelectedRow();
                             chPaymentDraftsByChristeningId[String(cid)] =
                                 serializeChristeningPaymentFeeToObject();
@@ -2604,7 +2649,9 @@
             var href = $(this).attr('href');
             ensureRegistryWorkflowStep(step, cid, function(ok) {
                 if (ok && href) {
-                    window.location.href = href;
+                    window.location.href = typeof window.sappcRegistryWorkflowUrlWithRecord === 'function'
+                        ? window.sappcRegistryWorkflowUrlWithRecord(href, cid)
+                        : href;
                 }
             });
         });
@@ -3083,6 +3130,7 @@
                         .done(function(res) {
                             if (res && res.ok && res.data) {
                                 applyChristeningScheduleDetailsToForm(res.data);
+                                overlayChristeningScheduleTopFromApplicationDraft(cid);
                             }
                         })
                         .fail(function(xhr) {

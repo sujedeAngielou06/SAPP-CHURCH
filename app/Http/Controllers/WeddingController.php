@@ -6,7 +6,9 @@ use App\Support\ClientNameDisplay;
 use App\Support\DocumentationApplicationReportWriter;
 use App\Support\SacramentApplicationGate;
 use App\Support\SacramentReferenceCode;
+use App\Support\SacramentRegistryContactOverlay;
 use App\Support\SacramentRegistrySectionFilter;
+use App\Support\SacramentRegistryWorkflowHeaderSeed;
 use App\Support\SacramentScheduleReservedDates;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
@@ -291,10 +293,6 @@ class WeddingController extends Controller
             ], 404);
         }
 
-        if (! SacramentApplicationGate::weddingIsCertificationSaved($weddingId)) {
-            return SacramentApplicationGate::certificationDenyResponse();
-        }
-
         $client = ClientNameDisplay::fullDisplayName(
             $row->clientFName ?? null,
             $row->clientMName ?? null,
@@ -314,18 +312,24 @@ class WeddingController extends Controller
             }
         }
 
+        $data = [
+            'wedding_id' => $weddingId,
+            'reference_code' => (string) ($row->referenceCode ?? ''),
+            'client' => $client,
+            'address' => ClientNameDisplay::formatAddress((string) ($row->address ?? '')),
+            'sex' => (string) ($row->sex ?? ''),
+            'contact_number' => (string) ($row->contactNum ?? ''),
+            'schedule_date' => $scheduleDate,
+            'schedule_time' => $scheduleTime,
+        ];
+        $data = SacramentRegistryContactOverlay::mergeEmptyFields(
+            $data,
+            $this->weddingContactOverlayFromApplication($row)
+        );
+
         return response()->json([
             'ok' => true,
-            'data' => [
-                'wedding_id' => $weddingId,
-                'reference_code' => (string) ($row->referenceCode ?? ''),
-                'client' => $client,
-                'address' => ClientNameDisplay::formatAddress((string) ($row->address ?? '')),
-                'sex' => (string) ($row->sex ?? ''),
-                'contact_number' => (string) ($row->contactNum ?? ''),
-                'schedule_date' => $scheduleDate,
-                'schedule_time' => $scheduleTime,
-            ],
+            'data' => $data,
         ]);
     }
 
@@ -363,10 +367,16 @@ class WeddingController extends Controller
         $this->ensureWeddingReferenceCode($weddingId);
         $row = DB::table('wedding')->where('weddingId', $weddingId)->first();
 
+        $data = $this->mapWeddingRowToPaymentFormFields($row);
+        $data = SacramentRegistryContactOverlay::mergeEmptyFields(
+            $data,
+            $this->weddingContactOverlayFromApplication($row)
+        );
+
         return response()->json([
             'ok' => true,
             'payment_complete' => SacramentApplicationGate::weddingIsPaymentComplete($weddingId),
-            'data' => $this->mapWeddingRowToPaymentFormFields($row),
+            'data' => $data,
         ]);
     }
 
@@ -630,12 +640,24 @@ class WeddingController extends Controller
                     'clientMName' => $nameParts['middle'],
                     'clientLName' => $nameParts['last'] !== '' ? $nameParts['last'] : null,
                     'marriageApplication' => $encoded,
+                    'contactNum' => $this->nullableText($data['groom_contact'] ?? null),
+                    'address' => ClientNameDisplay::nullableFormattedAddress($data['groom_present_address'] ?? null),
                 ], fn ($v) => $v !== null);
                 if (Schema::hasColumn('wedding', 'applicationCompletedAt')) {
                     $headerUpdate['applicationCompletedAt'] = now();
                 }
                 if (Schema::hasColumn('wedding', 'workflowStep')) {
                     $headerUpdate['workflowStep'] = SacramentRegistrySectionFilter::SECTION_APPLICATION;
+                }
+                $registryRow = DB::table('wedding')->where('weddingId', $weddingId)->first();
+                if ($registryRow !== null && Schema::hasColumn('wedding', 'paymentFeeRows')) {
+                    $rawFee = $registryRow->paymentFeeRows ?? null;
+                    if ($rawFee === null || trim((string) $rawFee) === '' || trim((string) $rawFee) === '[]') {
+                        $encodedFee = json_encode($this->defaultWeddingPaymentFeeRows(), JSON_UNESCAPED_UNICODE);
+                        if ($encodedFee !== false) {
+                            $headerUpdate['paymentFeeRows'] = $encodedFee;
+                        }
+                    }
                 }
                 DB::table('wedding')->where('weddingId', $weddingId)->update($headerUpdate);
                 $this->upsertWeddingDetailsFromMarriageApplication($weddingId, $data);
@@ -650,6 +672,11 @@ class WeddingController extends Controller
         }
 
         DocumentationApplicationReportWriter::syncWedding($weddingId, $data);
+
+        SacramentRegistryWorkflowHeaderSeed::afterApplicationSave(
+            SacramentRegistryWorkflowHeaderSeed::WEDDING,
+            $weddingId
+        );
 
         return response()->json([
             'ok' => true,
@@ -1584,6 +1611,42 @@ class WeddingController extends Controller
 
             return [$id, $ref];
         });
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function weddingContactOverlayFromApplication(object $row): array
+    {
+        $app = $this->decodeMarriageApplication($row);
+        if ($app === []) {
+            return [];
+        }
+
+        $groom = trim((string) ($app['groom_full_name'] ?? ''));
+        $bride = trim((string) ($app['bride_full_name'] ?? ''));
+        $client = $groom;
+        if ($groom !== '' && $bride !== '') {
+            $client = $groom.' & '.$bride;
+        } elseif ($bride !== '') {
+            $client = $bride;
+        }
+
+        $contact = trim((string) ($app['groom_contact'] ?? ''));
+        if ($contact === '') {
+            $contact = trim((string) ($app['bride_contact'] ?? ''));
+        }
+
+        $address = trim((string) ($app['groom_present_address'] ?? ''));
+        if ($address === '') {
+            $address = trim((string) ($app['bride_present_address'] ?? ''));
+        }
+
+        return [
+            'client' => $client,
+            'contact_number' => $contact,
+            'address' => $address,
+        ];
     }
 
     private function ensureWeddingReferenceCode(int $weddingId): string

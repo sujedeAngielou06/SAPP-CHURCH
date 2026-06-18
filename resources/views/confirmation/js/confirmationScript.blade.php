@@ -2,6 +2,7 @@
     $initialTablePayload = $initialTablePayload ?? null;
     $activeSection = $activeSection ?? 'schedule';
 @endphp
+@include('partials.sappcRegistryApplicationOverlayScript')
 <script>
     (function() {
         'use strict';
@@ -162,11 +163,8 @@
                 var q = u.searchParams.toString();
                 window.history.replaceState({}, '', u.pathname + (q ? '?' + q : '') + u.hash);
                 setTimeout(function() {
-                    if (typeof window.sappcRegistryWorkflowOpenRecord === 'function') {
-                        window.sappcRegistryWorkflowOpenRecord(id);
-                        return;
-                    }
                     setSelectedConfirmationId(id);
+                    $('#cnApplicationConfirmationId').val(id);
                     $('#confirmationTableBody tr.is-schedule-selected').removeClass('is-schedule-selected');
                     $('#confirmationTableBody tr').each(function() {
                         if (($(this).attr('data-record-id') || '').trim() === id) {
@@ -907,7 +905,9 @@
                 var href = $(this).attr('href');
                 ensureRegistryWorkflowStep(step, cid, function(ok) {
                     if (ok && href) {
-                        window.location.href = href;
+                        window.location.href = typeof window.sappcRegistryWorkflowUrlWithRecord === 'function'
+                            ? window.sappcRegistryWorkflowUrlWithRecord(href, cid)
+                            : href;
                     }
                 });
             });
@@ -1172,7 +1172,9 @@
                     }), jsonHeaders)
                         .done(function(res) {
                             if (res && res.ok && res.data) {
-                                applyConfirmationPaymentFeeFormObject(res.data);
+                                applyConfirmationPaymentFeeFormObject(
+                                    mergeConfirmationPaymentDataFromApplicationDraft(cid, res.data)
+                                );
                                 applyConfirmationRegistryTopFieldsFromSelectedRow();
                                 paymentBsModal.show();
                             }
@@ -1515,6 +1517,40 @@
                         }
                     });
                     updateConfirmationArancelTotal();
+                }
+
+                function mergeConfirmationPaymentDataFromApplicationDraft(cid, data) {
+                    if (!data || typeof data !== 'object') {
+                        return data;
+                    }
+                    var appSnap = cnApplicationDraftsByConfirmationId[String(cid)];
+                    if (!appSnap || typeof window.sappcRegistryTopFromConfirmationApplicationSnap !== 'function') {
+                        return data;
+                    }
+                    return window.sappcMergeRegistryTopEmpty(
+                        data,
+                        window.sappcRegistryTopFromConfirmationApplicationSnap(appSnap)
+                    );
+                }
+
+                function overlayConfirmationScheduleTopFromApplicationDraft(cid) {
+                    if (!cid || typeof window.sappcRegistryTopFromConfirmationApplicationSnap !== 'function') {
+                        return;
+                    }
+                    var appSnap = cnApplicationDraftsByConfirmationId[String(cid)];
+                    if (!appSnap) {
+                        return;
+                    }
+                    var merged = window.sappcMergeRegistryTopEmpty({
+                        client: ($('#cnScheduleClient').val() || '').trim(),
+                        contact_number: sappcPhMobileDigitsOnly($('#cnScheduleContact').val()),
+                        address: ($('#cnScheduleAddress').val() || '').trim()
+                    }, window.sappcRegistryTopFromConfirmationApplicationSnap(appSnap));
+                    $('#cnScheduleClient').val(merged.client || '');
+                    $('#cnScheduleContact').val(
+                        merged.contact_number ? formatPhMobileDisplay(String(merged.contact_number)) : ''
+                    );
+                    $('#cnScheduleAddress').val(merged.address || '');
                 }
 
                 function confirmationApplicationDraftKey() {
@@ -2443,6 +2479,7 @@
                             .done(function(res) {
                                 if (res && res.ok && res.data) {
                                     applyConfirmationScheduleDetailsToForm(res.data);
+                                    overlayConfirmationScheduleTopFromApplicationDraft(cid);
                                 }
                             })
                             .fail(function(xhr) {

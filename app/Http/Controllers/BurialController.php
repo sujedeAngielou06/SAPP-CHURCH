@@ -6,7 +6,9 @@ use App\Support\ClientNameDisplay;
 use App\Support\DocumentationApplicationReportWriter;
 use App\Support\SacramentApplicationGate;
 use App\Support\SacramentReferenceCode;
+use App\Support\SacramentRegistryContactOverlay;
 use App\Support\SacramentRegistrySectionFilter;
+use App\Support\SacramentRegistryWorkflowHeaderSeed;
 use App\Support\SacramentScheduleReservedDates;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
@@ -316,18 +318,24 @@ class BurialController extends Controller
             }
         }
 
+        $data = [
+            'burial_id' => $burialId,
+            'reference_code' => (string) ($row->referenceCode ?? ''),
+            'client' => $client,
+            'address' => ClientNameDisplay::formatAddress((string) ($row->address ?? '')),
+            'sex' => (string) ($row->sex ?? ''),
+            'contact_number' => (string) ($row->contactNum ?? ''),
+            'schedule_date' => $scheduleDate,
+            'schedule_time' => $scheduleTime,
+        ];
+        $data = SacramentRegistryContactOverlay::mergeEmptyFields(
+            $data,
+            $this->burialContactOverlayFromApplication($burialId)
+        );
+
         return response()->json([
             'ok' => true,
-            'data' => [
-                'burial_id' => $burialId,
-                'reference_code' => (string) ($row->referenceCode ?? ''),
-                'client' => $client,
-                'address' => ClientNameDisplay::formatAddress((string) ($row->address ?? '')),
-                'sex' => (string) ($row->sex ?? ''),
-                'contact_number' => (string) ($row->contactNum ?? ''),
-                'schedule_date' => $scheduleDate,
-                'schedule_time' => $scheduleTime,
-            ],
+            'data' => $data,
         ]);
     }
 
@@ -365,10 +373,16 @@ class BurialController extends Controller
         $this->ensureBurialReferenceCode($burialId);
         $row = DB::table('burial')->where('burialId', $burialId)->first();
 
+        $data = $this->mapBurialRowToPaymentFormFields($row);
+        $data = SacramentRegistryContactOverlay::mergeEmptyFields(
+            $data,
+            $this->burialContactOverlayFromApplication($burialId)
+        );
+
         return response()->json([
             'ok' => true,
             'payment_complete' => SacramentApplicationGate::burialIsPaymentComplete($burialId),
-            'data' => $this->mapBurialRowToPaymentFormFields($row),
+            'data' => $data,
         ]);
     }
 
@@ -637,6 +651,16 @@ class BurialController extends Controller
                 if (Schema::hasColumn('burial', 'workflowStep')) {
                     $headerUpdate['workflowStep'] = SacramentRegistrySectionFilter::SECTION_APPLICATION;
                 }
+                $registryRow = DB::table('burial')->where('burialId', $burialId)->first();
+                if ($registryRow !== null && Schema::hasColumn('burial', 'paymentFeeRows')) {
+                    $rawFee = $registryRow->paymentFeeRows ?? null;
+                    if ($rawFee === null || trim((string) $rawFee) === '' || trim((string) $rawFee) === '[]') {
+                        $encodedFee = json_encode($this->defaultBurialPaymentFeeRows(), JSON_UNESCAPED_UNICODE);
+                        if ($encodedFee !== false) {
+                            $headerUpdate['paymentFeeRows'] = $encodedFee;
+                        }
+                    }
+                }
                 DB::table('burial')->where('burialId', $burialId)->update($headerUpdate);
                 $existingDetails = DB::table('burial_details')->where('burialId', $burialId)->first();
                 if ($existingDetails) {
@@ -663,6 +687,11 @@ class BurialController extends Controller
         }
 
         DocumentationApplicationReportWriter::syncBurial($burialId, $data);
+
+        SacramentRegistryWorkflowHeaderSeed::afterApplicationSave(
+            SacramentRegistryWorkflowHeaderSeed::BURIAL,
+            $burialId
+        );
 
         return response()->json([
             'ok' => true,
@@ -1212,6 +1241,29 @@ class BurialController extends Controller
 
             return [$id, $ref];
         });
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function burialContactOverlayFromApplication(int $burialId): array
+    {
+        $details = DB::table('burial_details')
+            ->where('burialId', $burialId)
+            ->orderByDesc('burialDetailsId')
+            ->first();
+
+        if ($details === null) {
+            return [];
+        }
+
+        $app = $this->mapBurialDetailsRowToApplicationPayload($details);
+
+        return [
+            'client' => trim((string) ($app['deceased_name'] ?? '')),
+            'contact_number' => '',
+            'address' => trim((string) ($app['deceased_address'] ?? '')),
+        ];
     }
 
     private function ensureBurialReferenceCode(int $burialId): string

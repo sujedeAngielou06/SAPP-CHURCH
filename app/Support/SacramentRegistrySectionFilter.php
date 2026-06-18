@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Each registry workflow page shows only rows completed at that step.
- * Application save does not appear in schedule/payment/cert tables until that step is saved via its modal.
+ * Registry workflow pages share the same rows once an application is saved.
+ * Payment, certification, and schedule tabs list those records (ref, client, address, contact)
+ * so staff can open each modal when ready — steps are not required before the row appears.
  */
 final class SacramentRegistrySectionFilter
 {
@@ -39,22 +40,10 @@ final class SacramentRegistrySectionFilter
     private static function applyChristening(Builder $query, string $section): void
     {
         match ($section) {
-            self::SECTION_APPLICATION => $query->whereExists(function (Builder $sub) {
-                $sub->select(DB::raw('1'))
-                    ->from('christening_details as cd')
-                    ->whereColumn('cd.christeningId', 'christening.christeningId')
-                    ->whereRaw("TRIM(COALESCE(cd.firstName, '')) <> ''")
-                    ->whereRaw("TRIM(COALESCE(cd.familyName, '')) <> ''");
-            }),
-            self::SECTION_SCHEDULE => $query->whereNotNull('scheduleRequested')
-                ->whereRaw("TRIM(COALESCE(scheduleRequested, '')) <> ''"),
-            self::SECTION_PAYMENT => self::wherePaymentFeeSaved($query, 'christening'),
-            self::SECTION_CERTIFICATION => self::whereCertificationDetailsSaved(
-                $query,
-                'christening',
-                'christeningId',
-                'Christening'
-            ),
+            self::SECTION_APPLICATION,
+            self::SECTION_SCHEDULE,
+            self::SECTION_PAYMENT,
+            self::SECTION_CERTIFICATION => self::whereChristeningApplicationSaved($query),
             default => null,
         };
     }
@@ -62,31 +51,10 @@ final class SacramentRegistrySectionFilter
     private static function applyConfirmation(Builder $query, string $section): void
     {
         match ($section) {
-            self::SECTION_APPLICATION => $query->where(function (Builder $w) {
-                if (Schema::hasTable('confirmation_details')) {
-                    $w->whereExists(function (Builder $sub) {
-                        $sub->select(DB::raw('1'))
-                            ->from('confirmation_details as cd')
-                            ->whereColumn('cd.confirmationId', 'confirmation.confirmationId')
-                            ->whereRaw("TRIM(COALESCE(cd.firstName, '')) <> ''")
-                            ->whereRaw("TRIM(COALESCE(cd.familyName, '')) <> ''");
-                    });
-                }
-                $w->orWhere(function (Builder $w2) {
-                    $w2->whereNotNull('confirmationApplication')
-                        ->whereRaw("TRIM(COALESCE(confirmationApplication, '')) <> ''")
-                        ->whereRaw("TRIM(COALESCE(confirmationApplication, '')) <> '[]'");
-                });
-            }),
-            self::SECTION_SCHEDULE => $query->whereNotNull('scheduleRequested')
-                ->whereRaw("TRIM(COALESCE(scheduleRequested, '')) <> ''"),
-            self::SECTION_PAYMENT => self::wherePaymentFeeSaved($query, 'confirmation'),
-            self::SECTION_CERTIFICATION => self::whereCertificationDetailsSaved(
-                $query,
-                'confirmation',
-                'confirmationId',
-                'Confirmation'
-            ),
+            self::SECTION_APPLICATION,
+            self::SECTION_SCHEDULE,
+            self::SECTION_PAYMENT,
+            self::SECTION_CERTIFICATION => self::whereConfirmationApplicationSaved($query),
             default => null,
         };
     }
@@ -94,18 +62,10 @@ final class SacramentRegistrySectionFilter
     private static function applyWedding(Builder $query, string $section): void
     {
         match ($section) {
-            self::SECTION_APPLICATION => $query->whereNotNull('marriageApplication')
-                ->whereRaw("TRIM(COALESCE(marriageApplication, '')) <> ''")
-                ->whereRaw("TRIM(COALESCE(marriageApplication, '')) <> '[]'"),
-            self::SECTION_SCHEDULE => $query->whereNotNull('scheduleRequested')
-                ->whereRaw("TRIM(COALESCE(scheduleRequested, '')) <> ''"),
-            self::SECTION_PAYMENT => self::wherePaymentFeeSaved($query, 'wedding'),
-            self::SECTION_CERTIFICATION => self::whereCertificationDetailsSaved(
-                $query,
-                'wedding',
-                'weddingId',
-                'Wedding'
-            ),
+            self::SECTION_APPLICATION,
+            self::SECTION_SCHEDULE,
+            self::SECTION_PAYMENT,
+            self::SECTION_CERTIFICATION => self::whereWeddingApplicationSaved($query),
             default => null,
         };
     }
@@ -113,62 +73,65 @@ final class SacramentRegistrySectionFilter
     private static function applyBurial(Builder $query, string $section): void
     {
         match ($section) {
-            self::SECTION_APPLICATION => $query->where(function (Builder $w) {
-                if (Schema::hasTable('burial_details')) {
-                    $w->whereExists(function (Builder $sub) {
-                        $sub->select(DB::raw('1'))
-                            ->from('burial_details as bd')
-                            ->whereColumn('bd.burialId', 'burial.burialId')
-                            ->whereRaw("TRIM(COALESCE(bd.deceasedName, '')) <> ''");
-                    });
-                } else {
-                    $w->whereRaw('1 = 0');
-                }
-            }),
-            self::SECTION_SCHEDULE => $query->whereNotNull('scheduleRequested')
-                ->whereRaw("TRIM(COALESCE(scheduleRequested, '')) <> ''"),
-            self::SECTION_PAYMENT => self::wherePaymentFeeSaved($query, 'burial'),
-            self::SECTION_CERTIFICATION => self::whereCertificationDetailsSaved(
-                $query,
-                'burial',
-                'burialId',
-                'Burial'
-            ),
+            self::SECTION_APPLICATION,
+            self::SECTION_SCHEDULE,
+            self::SECTION_PAYMENT,
+            self::SECTION_CERTIFICATION => self::whereBurialApplicationSaved($query),
             default => null,
         };
     }
 
-    private static function whereCertificationDetailsSaved(
-        Builder $query,
-        string $table,
-        string $primaryKey,
-        string $registryType
-    ): void {
-        if (! Schema::hasTable('certification_details')) {
+    private static function whereChristeningApplicationSaved(Builder $query): void
+    {
+        $query->whereExists(function (Builder $sub) {
+            $sub->select(DB::raw('1'))
+                ->from('christening_details as cd')
+                ->whereColumn('cd.christeningId', 'christening.christeningId')
+                ->whereRaw("TRIM(COALESCE(cd.firstName, '')) <> ''")
+                ->whereRaw("TRIM(COALESCE(cd.familyName, '')) <> ''");
+        });
+    }
+
+    private static function whereConfirmationApplicationSaved(Builder $query): void
+    {
+        $query->where(function (Builder $w) {
+            if (Schema::hasTable('confirmation_details')) {
+                $w->whereExists(function (Builder $sub) {
+                    $sub->select(DB::raw('1'))
+                        ->from('confirmation_details as cd')
+                        ->whereColumn('cd.confirmationId', 'confirmation.confirmationId')
+                        ->whereRaw("TRIM(COALESCE(cd.firstName, '')) <> ''")
+                        ->whereRaw("TRIM(COALESCE(cd.familyName, '')) <> ''");
+                });
+            }
+            $w->orWhere(function (Builder $w2) {
+                $w2->whereNotNull('confirmationApplication')
+                    ->whereRaw("TRIM(COALESCE(confirmationApplication, '')) <> ''")
+                    ->whereRaw("TRIM(COALESCE(confirmationApplication, '')) <> '[]'");
+            });
+        });
+    }
+
+    private static function whereWeddingApplicationSaved(Builder $query): void
+    {
+        $query->whereNotNull('marriageApplication')
+            ->whereRaw("TRIM(COALESCE(marriageApplication, '')) <> ''")
+            ->whereRaw("TRIM(COALESCE(marriageApplication, '')) <> '[]'");
+    }
+
+    private static function whereBurialApplicationSaved(Builder $query): void
+    {
+        if (! Schema::hasTable('burial_details')) {
             $query->whereRaw('1 = 0');
 
             return;
         }
 
-        $query->whereExists(function (Builder $sub) use ($table, $primaryKey, $registryType) {
+        $query->whereExists(function (Builder $sub) {
             $sub->select(DB::raw('1'))
-                ->from('certification_details as cd')
-                ->where(function (Builder $match) use ($table, $primaryKey, $registryType) {
-                    CertificationRegistryMatch::applyMatch($match, $table, $primaryKey, $registryType);
-                });
+                ->from('burial_details as bd')
+                ->whereColumn('bd.burialId', 'burial.burialId')
+                ->whereRaw("TRIM(COALESCE(bd.deceasedName, '')) <> ''");
         });
-    }
-
-    private static function wherePaymentFeeSaved(Builder $query, string $table): void
-    {
-        if (! Schema::hasColumn($table, 'paymentFeeRows')) {
-            $query->whereRaw('LOWER(TRIM(COALESCE(paymentStatus, ?))) = ?', ['', 'paid']);
-
-            return;
-        }
-
-        $query->whereNotNull('paymentFeeRows')
-            ->whereRaw("TRIM(COALESCE(paymentFeeRows, '')) <> ''")
-            ->whereRaw("TRIM(COALESCE(paymentFeeRows, '')) <> '[]'");
     }
 }
