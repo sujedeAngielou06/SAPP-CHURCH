@@ -82,3 +82,11 @@ b,
     font-weight: 700 !important;
     -webkit-font-smoothing: auto;
 }
+
+.sappc-data-table thead th,
+.sappc-doc-table thead th,
+.sappc-doc-report-table-panel .sappc-data-table thead th,
+.sappc-table-panel .sappc-data-table thead th {
+    font-weight: 800 !important;
+    -webkit-font-smoothing: auto;
+}

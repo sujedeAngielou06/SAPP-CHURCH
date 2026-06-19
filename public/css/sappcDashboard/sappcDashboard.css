@@ -1360,7 +1360,7 @@ body.sappc-dash--locked-viewport .sappc-doc-page--report-active .sappc-doc-repor
 .sappc-data-table thead th {
     background: var(--sappc-panel-bg);
     color: #fff;
-    font-weight: 400;
+    font-weight: 800;
     font-size: 0.7rem;
     letter-spacing: 0.03em;
     white-space: nowrap;
