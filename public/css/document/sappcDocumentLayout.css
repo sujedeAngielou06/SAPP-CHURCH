@@ -670,8 +670,8 @@ body.sappc-dash--locked-viewport .sappc-registry-page {
 .sappc-doc-report-table-panel .sappc-data-table thead th {
     background: var(--sappc-panel-bg, #091d3a);
     color: #fff;
-    font-weight: 800;
-    font-size: 0.7rem;
+    font-weight: 600;
+   font-size: 0.7rem;
     letter-spacing: 0.03em;
     text-transform: uppercase;
     padding: 0.65rem 0.5rem;
@@ -706,7 +706,7 @@ body.sappc-dash--locked-viewport .sappc-registry-page {
 .sappc-doc-table thead th {
     background: var(--sappc-panel-bg, #091d3a);
     color: #fff;
-    font-weight: 800;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.03em;
     padding: 0.65rem 0.5rem;

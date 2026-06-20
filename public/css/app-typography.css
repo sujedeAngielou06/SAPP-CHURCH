@@ -87,6 +87,6 @@ b,
 .sappc-doc-table thead th,
 .sappc-doc-report-table-panel .sappc-data-table thead th,
 .sappc-table-panel .sappc-data-table thead th {
-    font-weight: 800 !important;
+    font-weight: 600 !important;
     -webkit-font-smoothing: auto;
 }
