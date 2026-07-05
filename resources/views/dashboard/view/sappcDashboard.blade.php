@@ -7,12 +7,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard — {{ config('app.name', 'SAPP Church') }}</title>
     @include('layouts.cdn')
+    @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/sappcDashboard/sappcDashboard.css') }}?v={{ filemtime(public_path('css/sappcDashboard/sappcDashboard.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/christening/applicationOfChristening.css') }}">
     <link rel="stylesheet" href="{{ asset('css/confirmation/confirmationKompirmaModals.css') }}">
     <link rel="stylesheet" href="{{ asset('css/wedding/marriageApplicationKasal.css') }}">
     <link rel="stylesheet" href="{{ asset('css/burial/burialApplication.css') }}">
-    @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/app-typography.css') }}?v={{ filemtime(public_path('css/app-typography.css')) }}">
 </head>
 

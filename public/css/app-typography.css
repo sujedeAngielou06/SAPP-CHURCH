@@ -90,3 +90,9 @@ b,
     font-weight: 600 !important;
     -webkit-font-smoothing: auto;
 }
+
+body.sappc-dash--dashboard .sappc-doc-stat_value,
+body.sappc-dash--dashboard .sappc-stat-monthly-tile_value {
+    font-weight: 700 !important;
+    -webkit-font-smoothing: auto;
+}

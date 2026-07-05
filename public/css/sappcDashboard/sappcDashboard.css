@@ -1001,6 +1001,26 @@ button.sappc-doc-stat_clickable:active {
     transform: translateY(1px);
 }
 
+body.sappc-dash--dashboard button.sappc-doc-stat,
+body.sappc-dash--dashboard button.sappc-doc-stat_clickable {
+    background-color: var(--sappc-stat-card-bg, #001a35);
+    border-color: #fff;
+    color: #fff;
+}
+
+body.sappc-dash--dashboard button.sappc-doc-stat:hover,
+body.sappc-dash--dashboard button.sappc-doc-stat_clickable:hover {
+    background-color: #052849;
+    border-color: #fff;
+    color: #fff;
+}
+
+body.sappc-dash--dashboard .sappc-doc-stat_label,
+body.sappc-dash--dashboard .sappc-doc-stat_value,
+body.sappc-dash--dashboard .sappc-doc-stat_icon {
+    color: #fff;
+}
+
 .sappc-stat-monthly-dialog {
     max-width: min(44rem, calc(100vw - 2rem));
 }
