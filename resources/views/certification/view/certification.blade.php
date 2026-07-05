@@ -16,7 +16,7 @@
             </h1>
             <p class="sappc-doc-page_breadcrumb mb-0">
                 <a href="{{ route('admin.dashboard') }}">Dashboard</a>
-                <span class="sappc-doc-page_sep" aria-hidden="true">|</span>    
+                <span class="sappc-doc-page_sep" aria-hidden="true">|</span>
                 <a href="{{ route('admin.document') }}">Document</a>
             </p>
         </header>
@@ -25,15 +25,15 @@
             <div class="sappc-doc-picker-card">
                 <a href="{{ route('admin.document') }}" class="sappc-doc-picker_close" title="Close" aria-label="Close">&times;</a>
 
-                <div class="sappc-doc-picker_header sappcModalHeaderPanel sappcModalHeaderPanel--centered">
-                      <img
+                <div class="sappc-doc-picker_header">
+                    <img
                         class="sappc-doc-picker_logo"
-                        src="{{ asset('assets/landingPage/SAPPC-transparent.png') }}"
+                        src="{{ asset('assets/logos/SAPPC.png') }}"
                         width="120"
                         height="120"
                         alt="Saint Anthony of Padua Parish Church"
                     >
-                    <h2 class="sappc-doc-picker_title">Document Record Report</h2>
+                    <h2 class="sappc-doc-picker_title">SAINT ANTHONY OF PADUA PARISH CHURCH</h2>
                 </div>
 
                 <hr class="sappc-doc-picker_divider">
@@ -70,7 +70,7 @@
         </div>
 
         <div class="sappc-doc-sheet" id="sappcCertDocumentSheet" style="display:none;">
-            <div class="sappc-doc-sheet__actions no-print sappc-cert-report-toolbar sappcModalHeaderPanel" role="toolbar" aria-label="Report export and print">
+            <div class="sappc-doc-sheet__actions no-print sappc-cert-report-toolbar" role="toolbar" aria-label="Report export and print">
                 <div class="sappc-doc-toolbar_month-field sappc-cert-report-toolbar_month">
                     <label for="sappcCertReportMonthToolbar" class="sappc-doc-toolbar_month-label">Select Month and Year:</label>
                     <div class="sappc-doc-picker_month-wrap sappc-doc-toolbar_month-wrap">
@@ -116,7 +116,7 @@
                 </div>
                 <img
                     class="sappc-doc-letterhead_seal"
-                    src="{{ asset('assets/landingPage/SAPPC-transparent.png') }}"
+                    src="{{ asset('assets/logos/SAPPC.png') }}"
                     width="100"
                     height="100"
                     alt=""
@@ -161,7 +161,6 @@
     <script>
         (function ($) {
             var recordsUrl = @json(route('admin.certification.records'));
-            var pdfUrl = @json(route('admin.certification.report-pdf'));
             var $root = $('#sappcCertPageRoot');
             var $picker = $('#sappcCertPickerWrap');
             var $sheet = $('#sappcCertDocumentSheet');
@@ -372,41 +371,14 @@
             });
 
             $('#sappcCertPrintBtn').on('click', function () {
-                var typeVal = ($type.val() || '').toString().trim();
-                var monthVal = ($monthToolbar.val() || $monthPicker.val() || '').toString().trim();
-                if (!typeVal || !monthVal) {
-                    window.alert('Select a report type and month first.');
-                    return;
-                }
-                var previewUrl =
-                    pdfUrl +
-                    '?inline=1&month=' +
-                    encodeURIComponent(monthVal) +
-                    '&report_type=' +
-                    encodeURIComponent(typeVal);
-                window.open(previewUrl, '_blank');
+                window.print();
             });
 
             $(document).on('click', '[data-cert-export]', function () {
                 var fmt = ($(this).attr('data-cert-export') || '').toLowerCase();
-                if (fmt === 'pdf') {
-                    var typeVal = ($type.val() || '').toString().trim();
-                    var monthVal = ($monthToolbar.val() || $monthPicker.val() || '').toString().trim();
-                    if (!typeVal || !monthVal) {
-                        window.alert('Select a report type and month first.');
-                        return;
-                    }
-                    window.location.href =
-                        pdfUrl +
-                        '?month=' +
-                        encodeURIComponent(monthVal) +
-                        '&report_type=' +
-                        encodeURIComponent(typeVal);
-                    return;
-                }
-                if (fmt === 'docx' || fmt === 'xlsx') {
+                if (fmt === 'pdf' || fmt === 'docx' || fmt === 'xlsx') {
                     window.alert(
-                        'Download ' + fmt.toUpperCase() + ' is not wired yet. Use PDF or Print Report.'
+                        'Download ' + fmt.toUpperCase() + ' is not wired yet. Use Print Report for a paper copy.'
                     );
                 }
             });
