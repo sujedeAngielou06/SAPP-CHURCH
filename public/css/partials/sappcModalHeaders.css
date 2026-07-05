@@ -802,14 +802,23 @@
 /* ── Document picker header (report type modal) ── */
 .sappc-doc-picker_header.sappcModalHeaderPanel {
     margin-bottom: 0;
-    border: none;
+    border: none !important;
     border-radius: var(--sappc-modal-header-radius) var(--sappc-modal-header-radius) 0 0;
     padding: 1.15rem 1rem 1rem;
+    box-shadow: none;
 }
 
 .sappc-doc-picker-card--compact .sappc-doc-picker_header.sappcModalHeaderPanel {
-    border-radius: var(--sappc-modal-header-radius);
-    margin-bottom: 0.85rem;
+    border-radius: var(--sappc-modal-header-radius) var(--sappc-modal-header-radius) 0 0;
+    margin-bottom: 0;
+}
+
+.sappc-doc-picker-card--report .sappc-doc-picker_header.sappcModalHeaderPanel {
+    border-radius: 1rem 1rem 0 0;
+    border: none !important;
+    margin: 0;
+    background: var(--sappc-panel-bg, #091d3a) !important;
+    box-shadow: none;
 }
 
 .sappc-doc-picker_header .sappc-doc-picker_logo {

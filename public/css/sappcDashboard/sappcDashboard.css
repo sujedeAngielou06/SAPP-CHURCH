@@ -1340,9 +1340,6 @@ body.sappc-dash--locked-viewport .sappc-doc-page--report-active .sappc-doc-repor
     transition: background-color 0.15s ease;
 }
 
-.sappc-table-reload-bar_text {
-}
-
 .sappc-table-reload-bar_btn:hover {
     background-color: #4f4f4f;
     color: #fff;

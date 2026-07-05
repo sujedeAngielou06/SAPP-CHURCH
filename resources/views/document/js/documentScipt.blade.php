@@ -22,8 +22,6 @@
         }
 
         function syncViewBtn() {
-            var ok = $type.val() !== '' && $type.val() != null;
-            $btn.prop('disabled', !ok);
             var typeVal = ($type.val() || '').toString().trim();
             if (typeVal && $service.length) {
                 var optText = $type.find('option:selected').text();
@@ -228,6 +226,7 @@
         $btn.on('click', function () {
             var typeVal = ($type.val() || '').toString().trim();
             if (!typeVal) {
+                window.alert('Please select a report type first.');
                 return;
             }
             var monthVal = ($monthPicker.val() || '').toString().trim();

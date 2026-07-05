@@ -22,49 +22,57 @@
         </header>
 
         <div class="sappc-doc-picker-wrap" id="sappcCertPickerWrap">
-            <div class="sappc-doc-picker-card">
+            <div class="sappc-doc-picker-card sappc-doc-picker-card--report">
                 <a href="{{ route('admin.document') }}" class="sappc-doc-picker_close" title="Close" aria-label="Close">&times;</a>
 
                 <div class="sappc-doc-picker_header sappcModalHeaderPanel sappcModalHeaderPanel--centered">
-                      <img
+                    <img
                         class="sappc-doc-picker_logo"
                         src="{{ asset('assets/landingPage/SAPPC-transparent.png') }}"
                         width="120"
                         height="120"
                         alt="Saint Anthony of Padua Parish Church"
                     >
-                    <h2 class="sappc-doc-picker_title">Document Record Report</h2>
+                    <h2 class="sappc-doc-picker_title">Certification Record Report</h2>
                 </div>
-
-                <hr class="sappc-doc-picker_divider">
 
                 <div class="sappc-doc-picker_body">
                     <div class="sappc-doc-picker_field">
                         <label for="sappcCertReportType" class="sappc-doc-picker_label">Certification Report Type:</label>
-                        <div class="sappc-doc-picker_select-wrap">
-                            <select id="sappcCertReportType" class="sappc-doc-picker_select" aria-label="Certification report type">
-                                <option value="" selected disabled>Please Select</option>
-                                <option value="christening">CHRISTENING</option>
-                                <option value="wedding">WEDDING</option>
-                            </select>
+                        <div class="sappc-doc-picker_input-group">
+                            <span class="sappc-doc-picker_input-icon" aria-hidden="true">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </span>
+                            <div class="sappc-doc-picker_select-wrap">
+                                <select id="sappcCertReportType" class="sappc-doc-picker_select" aria-label="Certification report type">
+                                    <option value="" selected disabled>Please Select</option>
+                                    <option value="christening">Christening</option>
+                                    <option value="wedding">Wedding</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
                     <div class="sappc-doc-picker_field">
                         <label for="sappcCertReportMonth" class="sappc-doc-picker_label">Select Month:</label>
-                        <div class="sappc-doc-picker_month-wrap">
-                            <input
-                                type="month"
-                                id="sappcCertReportMonth"
-                                class="sappc-doc-picker_month"
-                                name="report_month"
-                                value="{{ $certReportMonth ?? request('month', now()->format('Y-m')) }}"
-                                aria-label="Report month and year"
-                            >
+                        <div class="sappc-doc-picker_input-group">
+                            <span class="sappc-doc-picker_input-icon" aria-hidden="true">
+                                <i class="fa-solid fa-calendar"></i>
+                            </span>
+                            <div class="sappc-doc-picker_month-wrap">
+                                <input
+                                    type="month"
+                                    id="sappcCertReportMonth"
+                                    class="sappc-doc-picker_month"
+                                    name="report_month"
+                                    value="{{ $certReportMonth ?? request('month', now()->format('Y-m')) }}"
+                                    aria-label="Report month and year"
+                                >
+                            </div>
                         </div>
                     </div>
 
-                    <button type="button" class="sappc-doc-picker_btn" id="sappcCertViewReportBtn" disabled>View Report</button>
+                    <button type="button" class="sappc-doc-picker_btn" id="sappcCertViewReportBtn">View Report</button>
                 </div>
             </div>
         </div>
@@ -178,8 +186,6 @@
             }
 
             function syncViewBtn() {
-                var ok = $type.val() !== '' && $type.val() != null;
-                $btn.prop('disabled', !ok);
                 var typeVal = ($type.val() || '').toString().trim();
                 if (typeVal && $service.length) {
                     var optText = $type.find('option:selected').text();
@@ -359,6 +365,7 @@
             $btn.on('click', function () {
                 var typeVal = ($type.val() || '').toString().trim();
                 if (!typeVal) {
+                    window.alert('Please select a certification report type first.');
                     return;
                 }
                 var monthVal = ($monthPicker.val() || '').toString().trim();

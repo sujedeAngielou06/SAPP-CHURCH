@@ -26,7 +26,7 @@
         </header>
 
         <div class="sappc-doc-picker-wrap" id="sappcDocPickerWrap">
-            <div class="sappc-doc-picker-card sappc-doc-picker-card--compact">
+            <div class="sappc-doc-picker-card sappc-doc-picker-card--report">
                 <a href="{{ route('admin.document') }}" class="sappc-doc-picker_close" title="Close" aria-label="Close">&times;</a>
 
                 <div class="sappc-doc-picker_header sappcModalHeaderPanel sappcModalHeaderPanel--centered">
@@ -41,37 +41,45 @@
                     <h2 class="sappc-doc-picker_title">Document Record Report</h2>
                 </div>
 
-                <hr class="sappc-doc-picker_divider">
-
                 <div class="sappc-doc-picker_body">
                     <div class="sappc-doc-picker_field">
                         <label for="sappcDocType" class="sappc-doc-picker_label">Document Report Type:</label>
-                        <div class="sappc-doc-picker_select-wrap">
-                            <select id="sappcDocType" class="sappc-doc-picker_select" aria-label="Document report type">
-                                <option value="" selected disabled>Please Select</option>
-                                <option value="christening">CHRISTENING</option>
-                                <option value="confirmation">CONFIRMATION</option>
-                                <option value="wedding">WEDDING</option>
-                                <option value="burial">BURIAL</option>
-                            </select>
+                        <div class="sappc-doc-picker_input-group">
+                            <span class="sappc-doc-picker_input-icon" aria-hidden="true">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </span>
+                            <div class="sappc-doc-picker_select-wrap">
+                                <select id="sappcDocType" class="sappc-doc-picker_select" aria-label="Document report type">
+                                    <option value="" selected disabled>Please Select</option>
+                                    <option value="christening">Christening</option>
+                                    <option value="confirmation">Confirmation</option>
+                                    <option value="wedding">Wedding</option>
+                                    <option value="burial">Burial</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
                     <div class="sappc-doc-picker_field">
                         <label for="sappcDocReportMonth" class="sappc-doc-picker_label">Select Month:</label>
-                        <div class="sappc-doc-picker_month-wrap">
-                            <input
-                                type="month"
-                                id="sappcDocReportMonth"
-                                class="sappc-doc-picker_month"
-                                name="report_month"
-                                value="{{ $docReportMonth ?? request('month', now()->format('Y-m')) }}"
-                                aria-label="Report month and year"
-                            >
+                        <div class="sappc-doc-picker_input-group">
+                            <span class="sappc-doc-picker_input-icon" aria-hidden="true">
+                                <i class="fa-solid fa-calendar"></i>
+                            </span>
+                            <div class="sappc-doc-picker_month-wrap">
+                                <input
+                                    type="month"
+                                    id="sappcDocReportMonth"
+                                    class="sappc-doc-picker_month"
+                                    name="report_month"
+                                    value="{{ $docReportMonth ?? request('month', now()->format('Y-m')) }}"
+                                    aria-label="Report month and year"
+                                >
+                            </div>
                         </div>
                     </div>
 
-                    <button type="button" class="sappc-doc-picker_btn" id="sappcDocViewReportBtn" disabled>View Report</button>
+                    <button type="button" class="sappc-doc-picker_btn" id="sappcDocViewReportBtn">View Report</button>
                 </div>
             </div>
         </div>

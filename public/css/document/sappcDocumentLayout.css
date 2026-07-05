@@ -189,8 +189,9 @@ body.sappc-dash--locked-viewport .sappc-registry-page {
     justify-content: center;
     align-items: center;
     min-height: 0;
-    padding: 0.35rem 0 1.5rem;
+    padding: 0;
     box-sizing: border-box;
+    background: transparent;
 }
 
 .sappc-doc-picker-wrap.sappc-doc-picker-wrap--hidden {
@@ -210,10 +211,103 @@ body.sappc-dash--locked-viewport .sappc-registry-page {
     max-width: 22rem;
     min-height: 0;
     background: var(--sappc-white, #fff);
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    border-radius: 0.85rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
     padding: 1.35rem 1.5rem 1.25rem;
     box-sizing: border-box;
+    overflow: hidden;
+}
+
+.sappc-doc-picker-card--report {
+    max-width: 24rem;
+    padding: 0;
+    border-radius: 1rem;
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.14);
+    background: #fff;
+}
+
+.sappc-doc-picker-card--report .sappc-doc-picker_header {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1.35rem 1.25rem 1.15rem;
+    margin: 0;
+    border: none !important;
+    border-radius: 1rem 1rem 0 0;
+}
+
+.sappc-doc-picker-card--report .sappc-doc-picker_body {
+    padding: 1.15rem 1.35rem 1.35rem;
+    gap: 0.85rem;
+}
+
+.sappc-doc-picker-card--report .sappc-doc-picker_close {
+    top: 0.65rem;
+    right: 0.65rem;
+    color: #fff;
+    z-index: 2;
+}
+
+.sappc-doc-picker-card--report .sappc-doc-picker_close:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.sappc-doc-picker_input-group {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+}
+
+.sappc-doc-picker_input-icon {
+    flex: 0 0 2.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sappc-panel-bg, #091d3a);
+    color: #fff;
+    border: 2px solid var(--sappc-panel-bg, #091d3a);
+    border-right: none;
+    border-radius: 0.4rem 0 0 0.4rem;
+    font-size: 0.95rem;
+}
+
+.sappc-doc-picker_input-group .sappc-doc-picker_select-wrap,
+.sappc-doc-picker_input-group .sappc-doc-picker_month-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.sappc-doc-picker_input-group .sappc-doc-picker_select-wrap::after {
+    border-top-color: var(--sappc-panel-bg, #091d3a);
+}
+
+.sappc-doc-picker_input-group .sappc-doc-picker_select,
+.sappc-doc-picker_input-group .sappc-doc-picker_month {
+    border: 2px solid var(--sappc-panel-bg, #091d3a);
+    border-left: none;
+    border-radius: 0 0.4rem 0.4rem 0;
+}
+
+.sappc-doc-picker-card--report .sappc-doc-picker_btn {
+    margin-top: 0.15rem;
+    background: var(--sappc-panel-bg, #091d3a);
+    border: 2px solid var(--sappc-panel-bg, #091d3a);
+    border-radius: 0.5rem;
+    padding: 0.7rem 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: none;
+}
+
+.sappc-doc-picker-card--report .sappc-doc-picker_btn:hover:not(:disabled) {
+    background: #0d2142;
+    border-color: #0d2142;
+}
+
+.sappc-doc-picker-card--report .sappc-doc-picker_btn:disabled {
+    background: #6b7a8c;
+    border-color: #6b7a8c;
+    opacity: 1;
+    cursor: not-allowed;
 }
 
 .sappc-doc-picker_close {
@@ -527,9 +621,17 @@ body.sappc-dash--locked-viewport .sappc-registry-page {
 }
 
 @media (max-width: 768px) {
-    .sappc-doc-picker-card {
+    .sappc-doc-picker-card,
+    .sappc-doc-picker-card--report {
         max-width: 100%;
+    }
+
+    .sappc-doc-picker-card:not(.sappc-doc-picker-card--report) {
         padding: 1.15rem 1rem 1.1rem;
+    }
+
+    .sappc-doc-picker-card--report .sappc-doc-picker_body {
+        padding: 1rem 1rem 1.15rem;
     }
 
     .sappc-doc-picker_header {
