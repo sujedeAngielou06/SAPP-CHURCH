@@ -16,7 +16,7 @@
                     @csrf
                     <input type="hidden" name="burial_id" id="brAppBurialId" value="">
 
-                    <header class="sappcChOfficialHeader">
+                    <header class="sappcChOfficialHeader sappcModalHeaderPanel sappcModalHeaderPanel--letterhead">
                         <div class="sappcChOfficialLogo sappcChOfficialLogoLeft">
                             <img src="{{ asset('assets/logos/DSA.jpg') }}" width="80" height="80"
                                 alt="Diocese of San Jose de Antique" class="sappcChOfficialLogoImg">
@@ -29,7 +29,7 @@
                             <p class="sappcBurialAppDocTitle" role="heading" aria-level="1">APLIKASYON SA PAGPALUBONG</p>
                         </div>
                         <div class="sappcChOfficialLogo sappcChOfficialLogoRight sappcChOfficialLogoParishSeal">
-                            <img src="{{ asset('assets/logos/SAPPC.png') }}" width="80" height="80"
+                            <img src="{{ asset('assets/landingPage/SAPPC-transparent.png') }}" width="80" height="80"
                                 alt="Parish of St. Anthony of Padua, Barbaza"
                                 class="sappcChOfficialLogoImg sappcChOfficialLogoImgParishSeal">
                         </div>

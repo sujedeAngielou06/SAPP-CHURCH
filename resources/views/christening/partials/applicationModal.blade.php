@@ -14,8 +14,7 @@
                 <form class="sappcChristeningAppForm sappcChOfficial sappcChristeningAppSpread" id="christeningApplicationForm"
                     action="{{ route('admin.christening.application-form') }}" method="post" autocomplete="off"
                     data-save-url="{{ route('admin.christening.application-form') }}">
-                    <div class="sappcChristeningAppSpreadInner">
-                    <section class="sappcChristeningAppPage sappcChristeningAppPage--left" aria-label="Baptism application page 1">
+                    <section aria-label="Baptism application page 1">
                             <header class="sappcChOfficialHeader sappcModalHeaderPanel sappcModalHeaderPanel--letterhead">
                                 <div class="sappcChOfficialLogo sappcChOfficialLogoLeft">
                                     <img src="{{ asset('assets/logos/DSA.jpg') }}" width="88" height="88"
@@ -29,7 +28,7 @@
                                     <p class="sappcChOfficialDocTitle">APLIKASYON SA BUNYAG</p>
                                 </div>
                                 <div class="sappcChOfficialLogo sappcChOfficialLogoRight sappcChOfficialLogoParishSeal">
-                                    <img src="{{ asset('assets/logos/SAPPC.png') }}" width="88" height="88"
+                                    <img src="{{ asset('assets/landingPage/SAPPC-transparent.png') }}" width="88" height="88"
                                         alt="Parish of St. Anthony of Padua, Barbaza"
                                         class="sappcChOfficialLogoImg sappcChOfficialLogoImgParishSeal">
                                 </div>

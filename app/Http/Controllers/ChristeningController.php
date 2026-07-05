@@ -10,6 +10,7 @@ use App\Support\SacramentRegistryContactOverlay;
 use App\Support\SacramentRegistrySectionFilter;
 use App\Support\SacramentRegistryWorkflowHeaderSeed;
 use App\Support\SacramentScheduleReservedDates;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\QueryException;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class ChristeningController extends Controller
 {
@@ -139,6 +141,39 @@ class ChristeningController extends Controller
             'report_label' => $reportLabel,
             'service_heading' => $serviceHeading,
         ]);
+    }
+
+    public function certificationReportPdf(Request $request): Response
+    {
+        $validated = $request->validate([
+            'report_type' => ['nullable', 'string', 'in:christening,wedding'],
+            'month' => ['nullable', 'string'],
+        ]);
+
+        $reportType = (string) ($validated['report_type'] ?? '');
+        $month = $this->resolveCertificationReportMonth($validated['month'] ?? null);
+        $reportLabel = ClientNameDisplay::formatMonthYearLabel($month);
+        $serviceHeading = $reportType === 'wedding' ? 'WEDDING' : 'CHRISTENING';
+
+        $data = [
+            'report_type' => $reportType,
+            'month' => $month,
+            'report_label' => $reportLabel,
+            'service_heading' => $serviceHeading,
+            'rows' => $this->buildCertificationRowsFromDetailsTable($reportType, $month),
+        ];
+
+        $slug = strtolower(trim(preg_replace('/[^a-z0-9]+/i', '-', $reportLabel) ?? '', '-'));
+        $prefix = $reportType !== '' ? strtolower($reportType) : 'certification';
+        $filename = $prefix.'-certification-report'.($slug !== '' ? '-'.$slug : '').'.pdf';
+
+        $pdf = Pdf::loadView('pdf.certification-report', $data)->setPaper('a4', 'portrait');
+
+        if ($request->boolean('inline')) {
+            return $pdf->stream($filename);
+        }
+
+        return $pdf->download($filename);
     }
 
     private function buildCertificationRowsFromDetailsTable(string $reportType, ?string $monthYm = null): array
