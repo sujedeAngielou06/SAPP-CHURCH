@@ -197,7 +197,7 @@
 
     <div class="modal fade" id="christeningApplicationFormModal" tabindex="-1"
         aria-labelledby="christeningApplicationFormModalTitle" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered sappcChristeningAppModalDialog">
             <div class="modal-content sappcChristeningAppModal">
                 <div class="modal-header flex-wrap gap-2 border-bottom-0 pb-0 align-items-center">
                     <h2 class="modal-title h6 mb-0 text-muted fw-normal visually-hidden"
@@ -208,10 +208,11 @@
                     </div>
                 </div>
                 <div class="modal-body pt-0">
-                    <form class="sappcChristeningAppForm sappcChOfficial" id="christeningApplicationForm"
+                    <form class="sappcChristeningAppForm sappcChOfficial sappcChristeningAppSpread" id="christeningApplicationForm"
                         action="{{ route('admin.christening.application-form') }}" method="post" autocomplete="off"
                         data-save-url="{{ route('admin.christening.application-form') }}">
-                        <section aria-label="Baptism application page 1">
+                        <div class="sappcChristeningAppSpreadInner">
+                        <section class="sappcChristeningAppPage sappcChristeningAppPage--left" aria-label="Baptism application page 1">
                                 <header class="sappcChOfficialHeader">
                                     <div class="sappcChOfficialLogo sappcChOfficialLogoLeft">
                                         <img src="{{ asset('assets/logos/DSA.jpg') }}" width="88" height="88"
@@ -385,7 +386,7 @@
                                 </ol>
                         </section>
 
-                        <section aria-label="Baptism application page 2">
+                        <section class="sappcChristeningAppPage sappcChristeningAppPage--right" aria-label="Baptism application page 2">
                                 <div class="sappcChristeningAppFormPage2 sappcChOfficialPage2">
                                     <h2 class="sappcChOfficialPage2Title">Arancel kang bunyag</h2>
 
@@ -493,6 +494,7 @@
                                     </div>
                                 </div>
                         </section>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer sappcChristeningAppModalFooter">

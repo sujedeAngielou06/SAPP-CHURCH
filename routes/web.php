@@ -9,11 +9,11 @@ use App\Http\Controllers\WeddingController;
 use App\Http\Controllers\DocumentationController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'landingPage')->name('landingPage');
+Route::view('/', 'auth.adminLogin')->name('admin.login');
+Route::redirect('/admin', '/');
 
 Route::view('/developers', 'developers')->name('developers');
 
-Route::view('/admin', 'auth.adminLogin')->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
 
 Route::middleware('auth')->group(function () {

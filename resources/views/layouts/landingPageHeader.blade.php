@@ -25,9 +25,9 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
                 <li class="nav-item">
                     <a
-                        class="nav-link @if(request()->routeIs('landingPage')) active @endif"
-                        href="{{ route('landingPage') }}"
-                        @if(request()->routeIs('landingPage')) aria-current="page" @endif
+                        class="nav-link @if(request()->routeIs('admin.login')) active @endif"
+                        href="{{ route('admin.login') }}"
+                        @if(request()->routeIs('admin.login')) aria-current="page" @endif
                     >
                         <i class="fa-solid fa-house" aria-hidden="true"></i>
                         Home
@@ -41,16 +41,6 @@
                     >
                         <i class="fa-solid fa-laptop-code" aria-hidden="true"></i>
                         Developers
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a
-                        class="nav-link @if(request()->routeIs('admin.login')) active @endif"
-                        href="{{ route('admin.login') }}"
-                        @if(request()->routeIs('admin.login')) aria-current="page" @endif
-                    >
-                        <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
-                        Admin
                     </a>
                 </li>
             </ul>
