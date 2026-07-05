@@ -17,7 +17,7 @@
 @section('content')
     <header class="admin-login-header">
         <div class="admin-login-header__inner">
-            <a href="{{ route('admin.login') }}" class="admin-login-header__brand">
+            <a href="{{ route('landingPage') }}" class="admin-login-header__brand">
                 <img
                     class="admin-login-header__logo"
                     src="{{ asset('assets/landingPage/SAPPC.png') }}"
