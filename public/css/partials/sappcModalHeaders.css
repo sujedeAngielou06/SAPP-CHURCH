@@ -1,0 +1,969 @@
+:root {
+    --sappc-modal-navy: #1a2638;
+    --sappc-modal-navy-deep: #141e2e;
+    --sappc-modal-header-border: 3px solid #fff;
+    --sappc-modal-header-radius: 0.85rem;
+    --sappc-modal-header-pad: 1rem 1.15rem 1.1rem;
+    --sappc-modal-logo-slot: 4.5rem;
+    --sappc-modal-logo-centered: 5rem;
+}
+
+
+.sappcModalHeaderPanel {
+    background: var(--sappc-modal-navy);
+    border: var(--sappc-modal-header-border);
+    border-radius: var(--sappc-modal-header-radius);
+    padding: var(--sappc-modal-header-pad);
+    margin-bottom: 0.85rem;
+    color: #fff;
+}
+
+.sappcModalHeaderPanel--centered {
+    text-align: center;
+}
+
+.sappcModalHeaderPanel--letterhead {
+    padding-top: 0.85rem;
+}
+
+/* Parish letterhead inside panel */
+.sappcModalHeaderPanel .sappcChOfficialHeader,
+.sappcModalHeaderPanel .sappcCnAppHeader,
+.sappcModalHeaderPanel .sappcKasalAppHeader,
+.sappcModalHeaderPanel .sappcCnArHeader {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.sappcModalHeaderPanel .sappcChOfficialMastheadLine,
+.sappcModalHeaderPanel .sappcChOfficialMastheadLineStrong,
+.sappcModalHeaderPanel .sappcCnAppMasthead p,
+.sappcModalHeaderPanel .sappcCnArMasthead p,
+.sappcModalHeaderPanel .sappcKasalAppMastheadLine,
+.sappcModalHeaderPanel .sappcKasalAppMastheadLine--strong {
+    color: #fff !important;
+}
+
+.sappcModalHeaderPanel .sappcChOfficialDocTitle,
+.sappcModalHeaderPanel .sappcCnAppTitle,
+.sappcModalHeaderPanel .sappcCnArTitle,
+.sappcModalHeaderPanel .sappcKasalAppTitle,
+.sappcModalHeaderPanel .sappcBurialAppDocTitle {
+    color: #fff !important;
+    margin-top: 0.65rem;
+    margin-bottom: 0;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em;
+}
+
+.sappcModalHeaderPanel .sappcPaymentFeeModalLabel {
+    color: #fff;
+}
+
+.sappcModalHeaderPanel .sappcPaymentFeeModalFeeHeading {
+    color: #fff;
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em;
+}
+
+/* ── Logo layout (letterhead: DSA | masthead | SAPPC) ── */
+.sappcModalHeaderPanel .sappcChOfficialHeader,
+.sappcChOfficialHeader.sappcModalHeaderPanel {
+    display: grid;
+    grid-template-columns: var(--sappc-modal-logo-slot) minmax(0, 1fr) var(--sappc-modal-logo-slot);
+    gap: 0.65rem 0.85rem;
+    align-items: center;
+}
+
+.sappcModalHeaderPanel>.sappcCnAppHeader,
+.sappcModalHeaderPanel>.sappcCnArHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+}
+
+.sappcModalHeaderPanel .sappcChOfficialLogo,
+.sappcModalHeaderPanel .sappcCnAppLogo,
+.sappcModalHeaderPanel .sappcKasalAppLogo {
+    width: var(--sappc-modal-logo-slot);
+    height: var(--sappc-modal-logo-slot);
+    min-width: var(--sappc-modal-logo-slot);
+    min-height: var(--sappc-modal-logo-slot);
+    flex: 0 0 var(--sappc-modal-logo-slot);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.sappcModalHeaderPanel .sappcChOfficialLogoLeft,
+.sappcModalHeaderPanel .sappcChOfficialLogoRight,
+.sappcModalHeaderPanel .sappcCnAppLogo,
+.sappcModalHeaderPanel .sappcKasalAppLogo {
+    justify-content: center;
+}
+
+/* Diocese crest — white circular frame */
+.sappcModalHeaderPanel .sappcChOfficialLogoLeft,
+.sappcModalHeaderPanel .sappcCnAppLogo:first-child,
+.sappcModalHeaderPanel .sappcKasalAppLogo:first-child {
+    border-radius: 50%;
+    background: #fff;
+    overflow: hidden;
+    padding: 0.2rem;
+    box-sizing: border-box;
+}
+
+/* Parish seal — transparent, no crop */
+.sappcModalHeaderPanel .sappcChOfficialLogoParishSeal,
+.sappcModalHeaderPanel .sappcChOfficialLogoRight,
+.sappcModalHeaderPanel .sappcCnAppLogo:last-child,
+.sappcModalHeaderPanel .sappcKasalAppLogo:last-child {
+    background: transparent;
+    overflow: visible;
+    padding: 0;
+}
+
+.sappcModalHeaderPanel .sappcChOfficialLogoImg,
+.sappcModalHeaderPanel .sappcChOfficialLogoImgParishSeal,
+.sappcModalHeaderPanel .sappcCnAppLogo img,
+.sappcModalHeaderPanel .sappcKasalAppLogo img,
+.sappcModalHeaderPanel .sappcKasalAppLogoImg {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    object-position: center;
+    display: block;
+    border-radius: 0;
+}
+
+.sappcModalHeaderPanel .sappcChOfficialMasthead,
+.sappcModalHeaderPanel .sappcCnAppMasthead,
+.sappcModalHeaderPanel .sappcKasalAppMasthead {
+    min-width: 0;
+    text-align: center;
+}
+
+.sappcModalHeaderPanel--centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.sappcModalHeaderPanel--centered .sappcScheduleFormLogo,
+.sappcModalHeaderPanel--centered .sappc-doc-picker_logo {
+    display: block;
+    width: var(--sappc-modal-logo-centered);
+    height: var(--sappc-modal-logo-centered);
+    max-width: 100%;
+    margin: 0 auto 0.6rem;
+    object-fit: contain;
+    object-position: center;
+    background: transparent;
+    border-radius: 0;
+}
+
+.sappcCertModalMasthead.sappcModalHeaderPanel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.sappcCertModalMasthead .sappcCertModalLogoWrap {
+    width: var(--sappc-modal-logo-centered);
+    height: var(--sappc-modal-logo-centered);
+    margin: 0 auto 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.sappcCertModalMasthead .sappcCertModalLogoImg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain !important;
+    object-position: center;
+    display: block;
+}
+
+/* Document report letterhead logos */
+.sappc-doc-letterhead.sappcModalHeaderPanel .sappc-doc-letterhead_crest,
+.sappc-doc-letterhead.sappcModalHeaderPanel .sappc-doc-letterhead_seal {
+    width: var(--sappc-modal-logo-slot);
+    height: var(--sappc-modal-logo-slot);
+    object-fit: contain !important;
+    object-position: center;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+.sappc-doc-letterhead.sappcModalHeaderPanel .sappc-doc-letterhead_crest {
+    background: #fff;
+    border-radius: 50%;
+    padding: 0.2rem;
+    box-shadow: none;
+}
+
+.sappc-doc-letterhead.sappcModalHeaderPanel .sappc-doc-letterhead_seal {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+}
+
+.sappc-doc-picker-card:has(.sappcModalHeaderPanel) .sappc-doc-picker_divider {
+    display: none;
+}
+
+/* Standalone letterhead headers (application forms) — grid set above */
+.sappcChOfficialHeader.sappcModalHeaderPanel,
+.sappcKasalAppHeader.sappcModalHeaderPanel {
+    margin-bottom: 0.85rem;
+}
+
+#confirmationApplicationModal .sappcModalHeaderPanel>.sappcCnAppHeader,
+#confirmationApplicationModal .sappcModalHeaderPanel>.sappcCnArHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+    margin-bottom: 0;
+}
+
+#weddingMarriageApplicationModal .sappcKasalAppHeader.sappcModalHeaderPanel {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+}
+
+/* ── Schedule request form header ── */
+.sappcScheduleFormCard {
+    overflow: hidden;
+    padding: 0;
+    border: var(--sappc-modal-header-border);
+    border-radius: var(--sappc-modal-header-radius);
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    justify-self: stretch;
+    display: flex;
+    flex-direction: column;
+}
+
+.sappcScheduleFormHeader.sappcModalHeaderPanel {
+    margin-bottom: 0;
+    border: none;
+    border-radius: 0;
+    padding: 1.15rem 1rem 1rem;
+    position: relative;
+}
+
+.sappcScheduleFormHeader .sappcScheduleFormLogo {
+    width: var(--sappc-modal-logo-centered);
+    height: var(--sappc-modal-logo-centered);
+    object-fit: contain;
+    object-position: center;
+    margin: 0 auto 0.6rem;
+    border-radius: 0;
+    background: transparent;
+    display: block;
+}
+
+.sappcScheduleFormHeader h2 {
+    margin: 0;
+    font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+    font-weight: 700 !important;
+    color: #fff !important;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    line-height: 1.2;
+}
+
+.sappcScheduleFormCard .sappcScheduleFormDivider {
+    display: none;
+}
+
+.sappcScheduleFormCard form {
+    padding: 0.85rem 0.95rem 0.75rem;
+}
+
+.sappcScheduleRequestModal .sappcScheduleFormField {
+    display: grid;
+    grid-template-columns: 6.9rem 1fr;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.4rem;
+}
+
+.sappcScheduleRequestModal .sappcScheduleFormField label {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: #1f1f1f;
+}
+
+.sappcScheduleRequestModal .sappcScheduleFormField input,
+.sappcScheduleRequestModal .sappcScheduleFormField select {
+    width: 100%;
+    border: 1px solid #777;
+    border-radius: 0.15rem;
+    min-height: 1.95rem;
+    padding: 0.2rem 0.45rem;
+    font-size: 0.78rem;
+}
+
+.sappcScheduleRequestModal .sappcScheduleInputIconWrap {
+    position: relative;
+}
+
+.sappcScheduleRequestModal .sappcScheduleInputIconWrap input {
+    padding-right: 1.6rem;
+}
+
+.sappcScheduleRequestModal .sappcScheduleInputIconWrap i {
+    position: absolute;
+    right: 0.45rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #444;
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+.sappcScheduleRequestModal .sappcScheduleFormActions {
+    margin-top: auto;
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.35rem 0.95rem 0.95rem;
+    justify-items: stretch;
+}
+
+.sappcScheduleRequestModal .sappcScheduleActionBtn {
+    border: 1px solid #6c6c6c;
+    border-radius: 0.2rem;
+    min-height: 2.15rem;
+    width: 100%;
+    max-width: none;
+    font-size: 0.78rem;
+    color: #fff;
+}
+
+.sappcScheduleRequestModal .sappcScheduleActionBtn.is-cancel {
+    background: #920914;
+}
+
+.sappcScheduleRequestModal .sappcScheduleActionBtn.is-reserve {
+    background: #c29522;
+}
+
+/* ── Schedule calendar toolbar (navy + white controls) ── */
+.sappcScheduleCalendarHead {
+    background: var(--sappc-modal-navy) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 0.35rem;
+    padding: 0.45rem 0.5rem;
+    gap: 0.4rem;
+}
+
+.sappcScheduleCalNav {
+    border: 1px solid rgba(255, 255, 255, 0.75) !important;
+    border-radius: 0.2rem;
+    background: transparent !important;
+    color: #fff !important;
+    min-height: 1.75rem;
+    min-width: 1.75rem;
+    padding: 0;
+    line-height: 1;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sappcScheduleCalNav:hover,
+.sappcScheduleCalNav:focus {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #fff !important;
+}
+
+.sappcScheduleCalendarMonthNo {
+    color: #fff !important;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.sappcScheduleCalendarMonth,
+.sappcScheduleCalendarYear {
+    border: 1px solid rgba(255, 255, 255, 0.75) !important;
+    border-radius: 0.2rem;
+    background: transparent !important;
+    color: #fff !important;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    min-height: 1.75rem;
+    padding: 0.2rem 1.65rem 0.2rem 0.45rem;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3E%3Cpath d='M4.646 6.646a.5.5 0 0 1 .708 0L8 9.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.35rem center !important;
+    background-size: 0.65rem !important;
+}
+
+.sappcScheduleCalendarYear {
+    letter-spacing: 0.04em;
+    font-size: 0.78rem;
+    padding-right: 1.55rem;
+    max-width: 5.5rem;
+}
+
+.sappcScheduleCalendarMonth option,
+.sappcScheduleCalendarYear option {
+    color: #1a2638;
+    background: #fff;
+}
+
+#christeningScheduleRequestModal .modal-dialog,
+#confirmationScheduleRequestModal .modal-dialog,
+#weddingScheduleRequestModal .modal-dialog,
+#burialScheduleRequestModal .modal-dialog {
+    max-width: min(96vw, 1050px);
+}
+
+.sappcScheduleRequestModal .sappcScheduleRequestLayout {
+    grid-template-columns: 58fr 42fr !important;
+    gap: 0.75rem;
+    align-items: stretch;
+}
+
+.sappcScheduleRequestModal .sappcScheduleCalendarCard {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0.75rem;
+    border: 1px solid #a3a3a3;
+    border-radius: 0.35rem;
+}
+
+.sappcScheduleRequestModal .sappcScheduleCalNav {
+    display: none !important;
+}
+
+.sappcScheduleRequestModal .sappcScheduleCalendarHead--interactive {
+    grid-template-columns: auto minmax(8rem, 1fr) auto !important;
+    gap: 0.55rem !important;
+}
+
+.sappcScheduleCalendarHead {
+    width: 100%;
+    padding: 0.55rem 0.65rem !important;
+    margin-bottom: 0.65rem;
+    min-height: 3.1rem;
+}
+
+.sappcScheduleCalendarHead--interactive {
+    grid-template-columns: auto auto minmax(8.5rem, 1fr) auto auto !important;
+    gap: 0.5rem !important;
+}
+
+.sappcScheduleRequestModal .sappcScheduleCalendarHead--interactive {
+    grid-template-columns: auto minmax(8rem, 1fr) auto !important;
+    gap: 0.55rem !important;
+}
+
+.sappcScheduleCalendarMonthNo {
+    font-size: 2.35rem !important;
+    font-weight: 700 !important;
+    line-height: 1;
+    min-width: 1.75rem;
+    padding: 0 0.35rem 0 0.15rem !important;
+    text-align: center;
+}
+
+.sappcScheduleCalendarMonth {
+    min-height: 2.35rem !important;
+    font-size: 0.82rem !important;
+    letter-spacing: 0.22em !important;
+    padding: 0.25rem 2rem 0.25rem 0.65rem !important;
+}
+
+.sappcScheduleCalendarYear {
+    min-height: 2.35rem !important;
+    min-width: 5.25rem;
+    max-width: none;
+    font-size: 0.82rem !important;
+    padding: 0.25rem 1.75rem 0.25rem 0.55rem !important;
+}
+
+.sappcScheduleCalNav {
+    min-height: 2.35rem !important;
+    min-width: 2.35rem !important;
+    font-size: 0.85rem !important;
+}
+
+.sappcScheduleCalendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0;
+    border-left: 1px solid #bebebe !important;
+    border-top: 1px solid #bebebe !important;
+    padding: 0;
+}
+
+.sappcScheduleCalendarWeekday {
+    border-right: 1px solid #bebebe !important;
+    border-bottom: 1px solid #bebebe !important;
+    background: #fff !important;
+    text-align: center;
+    font-weight: 700;
+    font-size: clamp(0.72rem, 1.1vw, 0.95rem);
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    padding: 0.35rem 0.1rem 0.45rem;
+    color: #111 !important;
+    text-transform: uppercase;
+}
+
+.sappcScheduleCalendarWeekday.sunday,
+.sappcScheduleCalendarWeekday.saturday {
+    color: #8f171f !important;
+}
+
+.sappcScheduleDayPad {
+    min-height: 5rem;
+    border-right: 1px solid #bebebe !important;
+    border-bottom: 1px solid #bebebe !important;
+    background: #fff !important;
+}
+
+.sappcScheduleDay {
+    position: relative;
+    isolation: isolate;
+    min-height: 5rem;
+    margin: 0;
+    padding: 0.55rem 0.2rem;
+    border: none !important;
+    border-right: 1px solid #bebebe !important;
+    border-bottom: 1px solid #bebebe !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #b1891c !important;
+    font-size: 1.65rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.1rem;
+    box-sizing: border-box;
+    z-index: 0;
+}
+
+.sappcScheduleDay::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.5rem;
+    inset-inline: 0.1rem;
+    border: 3px solid #b1891c;
+    border-radius: 0.35rem;
+    background: #fff;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.sappcScheduleDay>span {
+    position: relative;
+    z-index: 1;
+}
+
+.sappcScheduleDay.is-sunday,
+.sappcScheduleDay.is-saturday {
+    color: #8f171f !important;
+}
+
+.sappcScheduleDay.is-sunday::before,
+.sappcScheduleDay.is-saturday::before {
+    border-color: #8f171f;
+}
+
+.sappcScheduleDay.is-reserved {
+    background: #fff !important;
+    color: #fff !important;
+}
+
+.sappcScheduleDay.is-reserved::before {
+    border-color: #c29522;
+    background: #c29522;
+}
+
+.sappcScheduleDay.is-reserved.is-sunday,
+.sappcScheduleDay.is-reserved.is-saturday {
+    background: #fff !important;
+    color: #fff !important;
+}
+
+.sappcScheduleDay.is-reserved.is-sunday::before,
+.sappcScheduleDay.is-reserved.is-saturday::before {
+    border-color: #950d16;
+    background: #950d16;
+}
+
+.sappcScheduleDay.is-full {
+    background: #fff !important;
+    color: #fff !important;
+}
+
+.sappcScheduleDay.is-full::before {
+    border-color: #950d16;
+    background: #950d16;
+}
+
+.sappcScheduleDay.is-selected {
+    background: #fff !important;
+    color: #fff !important;
+    box-shadow: none;
+}
+
+.sappcScheduleDay.is-selected::before {
+    border-color: #c29522;
+    background: #c29522;
+}
+
+.sappcScheduleDay.is-selected.is-sunday,
+.sappcScheduleDay.is-selected.is-saturday {
+    background: #fff !important;
+    color: #fff !important;
+}
+
+.sappcScheduleDay.is-selected.is-sunday::before,
+.sappcScheduleDay.is-selected.is-saturday::before {
+    border-color: #950d16;
+    background: #950d16;
+}
+
+.sappcScheduleDayNum {
+    font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+    font-weight: 700;
+    line-height: 1;
+    color: inherit;
+}
+
+.sappcScheduleDayLabel {
+    font-size: 0.48rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-top: 0.15rem;
+    color: inherit;
+}
+
+.sappcScheduleDay.is-reserved .sappcScheduleDayLabel,
+.sappcScheduleDay.is-selected .sappcScheduleDayLabel,
+.sappcScheduleDay.is-full .sappcScheduleDayLabel {
+    color: #fff !important;
+}
+
+.sappcScheduleDayReserved {
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+@media (max-width: 991.98px) {
+    .sappcScheduleRequestModal .sappcScheduleRequestLayout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .sappcScheduleRequestModal .sappcScheduleFormCard {
+        max-width: none;
+        justify-self: stretch;
+    }
+
+    .sappcScheduleCalendarMonthNo {
+        font-size: 2rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .sappcScheduleRequestModal .sappcScheduleFormField {
+        grid-template-columns: 1fr;
+        gap: 0.2rem;
+        margin-bottom: 0.5rem;
+    }
+}
+
+.sappcScheduleFormHeader .sappcScheduleRequestModalClose.btn-close,
+#christeningScheduleRequestModal .sappcScheduleRequestModalClose.btn-close,
+#confirmationScheduleRequestModal .sappcScheduleRequestModalClose.btn-close,
+#weddingScheduleRequestModal .sappcScheduleRequestModalClose.btn-close,
+#burialScheduleRequestModal .sappcScheduleRequestModalClose.btn-close,
+.sappcScheduleRequestModal .sappcScheduleRequestModalClose.btn-close {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.55rem;
+    z-index: 2;
+    width: 1.65rem;
+    height: 1.65rem;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    background-color: transparent;
+    box-sizing: border-box;
+    opacity: 1;
+    filter: brightness(0) invert(1);
+    background-size: 0.5em;
+    box-shadow: none;
+}
+
+#christeningScheduleRequestModal .sappcScheduleRequestModalClose.btn-close:hover,
+#confirmationScheduleRequestModal .sappcScheduleRequestModalClose.btn-close:hover,
+#weddingScheduleRequestModal .sappcScheduleRequestModalClose.btn-close:hover,
+#burialScheduleRequestModal .sappcScheduleRequestModalClose.btn-close:hover,
+.sappcScheduleRequestModal .sappcScheduleRequestModalClose.btn-close:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    opacity: 1;
+}
+
+#christeningScheduleRequestModal .sappcScheduleRequestModalClose.btn-close:focus,
+#confirmationScheduleRequestModal .sappcScheduleRequestModalClose.btn-close:focus,
+#weddingScheduleRequestModal .sappcScheduleRequestModalClose.btn-close:focus,
+#burialScheduleRequestModal .sappcScheduleRequestModalClose.btn-close:focus,
+.sappcScheduleRequestModal .sappcScheduleRequestModalClose.btn-close:focus {
+    opacity: 1;
+    box-shadow: 0 0 0 0.15rem rgba(255, 255, 255, 0.35);
+}
+
+/* ── Certification form masthead ── */
+.sappcCertModalMasthead.sappcModalHeaderPanel {
+    margin-bottom: 0.85rem;
+    border-bottom: none;
+    padding: 1.15rem 1rem 1rem;
+    position: relative;
+}
+
+.sappcCertModalMasthead .sappcCertModalClose.btn-close,
+#christeningCertificationModal .sappcCertModalClose.btn-close,
+#confirmationCertificationModal .sappcCertModalClose.btn-close,
+#weddingCertificationModal .sappcCertModalClose.btn-close,
+#burialCertificationModal .sappcCertModalClose.btn-close {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.55rem;
+    z-index: 2;
+    width: 1.65rem;
+    height: 1.65rem;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    background-color: transparent;
+    box-sizing: border-box;
+    opacity: 1;
+    filter: brightness(0) invert(1);
+    background-size: 0.5em;
+    box-shadow: none;
+}
+
+.sappcCertModalMasthead .sappcCertModalClose.btn-close:hover,
+#christeningCertificationModal .sappcCertModalClose.btn-close:hover,
+#confirmationCertificationModal .sappcCertModalClose.btn-close:hover,
+#weddingCertificationModal .sappcCertModalClose.btn-close:hover,
+#burialCertificationModal .sappcCertModalClose.btn-close:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    opacity: 1;
+}
+
+.sappcCertModalMasthead .sappcCertModalClose.btn-close:focus,
+#christeningCertificationModal .sappcCertModalClose.btn-close:focus,
+#confirmationCertificationModal .sappcCertModalClose.btn-close:focus,
+#weddingCertificationModal .sappcCertModalClose.btn-close:focus,
+#burialCertificationModal .sappcCertModalClose.btn-close:focus {
+    opacity: 1;
+    box-shadow: 0 0 0 0.15rem rgba(255, 255, 255, 0.35);
+}
+
+.sappcCertModalMasthead .sappcCertModalTitle {
+    color: #fff !important;
+    font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+    font-weight: 700 !important;
+    letter-spacing: 0.07em;
+}
+
+/* ── Document picker header (report type modal) ── */
+.sappc-doc-picker_header.sappcModalHeaderPanel {
+    margin-bottom: 0;
+    border: none;
+    border-radius: var(--sappc-modal-header-radius) var(--sappc-modal-header-radius) 0 0;
+    padding: 1.15rem 1rem 1rem;
+}
+
+.sappc-doc-picker-card--compact .sappc-doc-picker_header.sappcModalHeaderPanel {
+    border-radius: var(--sappc-modal-header-radius);
+    margin-bottom: 0.85rem;
+}
+
+.sappc-doc-picker_header .sappc-doc-picker_logo {
+    width: var(--sappc-modal-logo-centered);
+    height: var(--sappc-modal-logo-centered);
+    object-fit: contain;
+    object-position: center;
+    background: transparent;
+    box-shadow: none;
+    display: block;
+    margin: 0 auto 0.6rem;
+    border-radius: 0;
+}
+
+.sappc-doc-picker_header .sappc-doc-picker_title {
+    color: #fff !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.07em;
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+}
+
+/* ── Document report letterhead ── */
+.sappc-doc-letterhead.sappcModalHeaderPanel {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.85rem 1.1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem 1.15rem;
+}
+
+.sappc-doc-letterhead.sappcModalHeaderPanel .sappc-doc-letterhead_line,
+.sappc-doc-letterhead.sappcModalHeaderPanel .sappc-doc-letterhead_line--primary,
+.sappc-doc-letterhead.sappcModalHeaderPanel .sappc-doc-letterhead_line--sub {
+    color: #fff !important;
+}
+
+/* ── Report toolbar (month / print / download) ── */
+.sappc-doc-report-toolbar.sappcModalHeaderPanel,
+.sappc-doc-sheet__actions.sappc-doc-report-toolbar.sappcModalHeaderPanel,
+.sappc-cert-report-toolbar.sappcModalHeaderPanel,
+.sappc-doc-report-window_toolbar.sappcModalHeaderPanel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.75rem 1rem;
+    margin: 0 0 1rem;
+    padding: 0.85rem 1rem;
+    border-bottom: none;
+    background: #0d2142 !important;
+    border: none;
+    border-radius: 0.35rem;
+}
+
+.sappc-doc-report-toolbar .sappc-doc-toolbar_month-label,
+.sappc-cert-report-toolbar .sappc-doc-toolbar_month-label {
+    color: #fff;
+    font-size: 0.875rem;
+}
+
+.sappc-doc-report-toolbar .sappc-doc-picker_month,
+.sappc-doc-report-toolbar .sappc-doc-toolbar_month-input,
+.sappc-cert-report-toolbar .sappc-doc-picker_month,
+.sappc-cert-report-toolbar .sappc-doc-toolbar_month-input {
+    border-color: #fff;
+    border-radius: 0.35rem;
+}
+
+.sappc-doc-report-toolbar .sappc-doc-toolbar_print,
+.sappc-cert-report-toolbar .sappc-doc-toolbar_print {
+    color: #fff;
+    background: transparent;
+    border: 1px solid #fff;
+    border-radius: 0.35rem;
+    min-width: auto;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8125rem;
+    text-transform: none;
+    letter-spacing: 0.02em;
+}
+
+.sappc-doc-report-toolbar .sappc-doc-toolbar_print:hover,
+.sappc-cert-report-toolbar .sappc-doc-toolbar_print:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.sappc-doc-report-toolbar .sappc-doc-toolbar_exports::before,
+.sappc-cert-report-toolbar .sappc-doc-toolbar_exports::before {
+    content: 'Download';
+    color: #fff;
+    font-size: 0.8125rem;
+    margin-right: 0.35rem;
+}
+
+.sappc-doc-report-toolbar .sappc-doc-toolbar_icon,
+.sappc-cert-report-toolbar .sappc-doc-toolbar_icon {
+    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1rem;
+}
+
+.sappc-doc-report-toolbar .sappc-doc-toolbar_icon:hover,
+.sappc-cert-report-toolbar .sappc-doc-toolbar_icon:hover {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+}
+
+/* ── Modal close buttons on dark surfaces ── */
+.sappcPaymentFeeModal .modal-header .btn-close,
+.sappcChristeningCertificationModal .modal-header .btn-close,
+.sappcChristeningAppModal .modal-header .btn-close,
+#confirmationApplicationModal .modal-header .btn-close,
+#weddingMarriageApplicationModal .modal-header .btn-close,
+#burialApplicationFormModal .modal-header .btn-close {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    background-color: #fff;
+    opacity: 1;
+    box-sizing: border-box;
+}
+
+@media (max-width: 767.98px) {
+
+    .sappcModalHeaderPanel .sappcChOfficialHeader,
+    .sappcChOfficialHeader.sappcModalHeaderPanel {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+    }
+
+    .sappcModalHeaderPanel>.sappcCnAppHeader,
+    .sappcModalHeaderPanel>.sappcCnArHeader {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .sappcModalHeaderPanel .sappcChOfficialLogoLeft,
+    .sappcModalHeaderPanel .sappcChOfficialLogoRight,
+    .sappcModalHeaderPanel .sappcCnAppLogo,
+    .sappcModalHeaderPanel .sappcKasalAppLogo {
+        justify-content: center;
+    }
+
+    .sappc-doc-letterhead.sappcModalHeaderPanel {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+    }
+}

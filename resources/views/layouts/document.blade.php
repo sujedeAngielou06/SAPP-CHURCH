@@ -29,16 +29,16 @@
             <div class="sappc-doc-picker-card sappc-doc-picker-card--compact">
                 <a href="{{ route('admin.document') }}" class="sappc-doc-picker_close" title="Close" aria-label="Close">&times;</a>
 
-                <div class="sappc-doc-picker_header">
+                <div class="sappc-doc-picker_header sappcModalHeaderPanel sappcModalHeaderPanel--centered">
                     <img
                         class="sappc-doc-picker_logo"
-                        src="{{ asset('assets/logos/SAPPC.png') }}"
+                        src="{{ asset('assets/landingPage/SAPPC-transparent.png') }}"
                         width="88"
                         height="88"
                         alt="Saint Anthony of Padua Parish Church"
                     >
 
-                    <h2 class="sappc-doc-picker_title">SAINT ANTHONY OF PADUA PARISH CHURCH</h2>
+                    <h2 class="sappc-doc-picker_title">Document Record Report</h2>
                 </div>
 
                 <hr class="sappc-doc-picker_divider">
@@ -77,7 +77,7 @@
         </div>
 
         <div class="sappc-doc-sheet" id="sappcDocumentSheet" style="display:none;">
-            <div class="sappc-doc-sheet__actions no-print sappc-doc-report-toolbar" id="sappcDocToolbar" role="toolbar" aria-label="Report export and print">
+            <div class="sappc-doc-sheet__actions no-print sappc-doc-report-toolbar sappcModalHeaderPanel" id="sappcDocToolbar" role="toolbar" aria-label="Report export and print">
                 <div class="sappc-doc-toolbar_month-field sappc-doc-report-toolbar_month">
                     <label for="sappcDocReportMonthToolbar" class="sappc-doc-toolbar_month-label">Select Month and Year:</label>
                     <div class="sappc-doc-picker_month-wrap sappc-doc-toolbar_month-wrap">
@@ -123,7 +123,7 @@
                 </div>
                 <img
                     class="sappc-doc-letterhead_seal"
-                    src="{{ asset('assets/logos/SAPPC.png') }}"
+                    src="{{ asset('assets/landingPage/SAPPC-transparent.png') }}"
                     width="100"
                     height="100"
                     alt=""

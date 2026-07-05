@@ -10,6 +10,7 @@
                     @csrf
                     <input type="hidden" name="confirmation_id" id="cnApplicationConfirmationId" value="">
 
+                    <div class="sappcModalHeaderPanel sappcModalHeaderPanel--letterhead">
                     <div class="sappcCnAppHeader">
                         <div class="sappcCnAppLogo">
                             <img src="{{ asset('assets/logos/DSA.jpg') }}" width="80" height="80" alt="">
@@ -20,11 +21,12 @@
                             <p>Barbaza, 5706, Antique, Philippines</p>
                         </div>
                         <div class="sappcCnAppLogo">
-                            <img src="{{ asset('assets/logos/SAPPC.png') }}" width="80" height="80" alt="" class="sappcCnAppLogoParish">
+                            <img src="{{ asset('assets/landingPage/SAPPC-transparent.png') }}" width="80" height="80" alt="" class="sappcCnAppLogoParish">
                         </div>
                     </div>
 
                     <h1 class="sappcCnAppTitle">APLIKASYON SA KOMPIRMA</h1>
+                    </div>
 
                     <div class="sappcCnAppRow">
                         <label class="sappcCnAppLabel" for="cnAppFirstName">First name</label>

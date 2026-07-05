@@ -17,6 +17,7 @@
                             data-default-reference-code="{{ $generatedReferenceCode ?? '' }}"
                             data-default-fee-rows='@json($defaultPaymentFeeRows ?? [])'>
                             <div class="sappcChOfficial sappcPaymentFeeModalOfficial">
+                                <div class="sappcModalHeaderPanel sappcModalHeaderPanel--letterhead">
                                 <header class="sappcChOfficialHeader">
                                     <div class="sappcChOfficialLogo sappcChOfficialLogoLeft">
                                         <img src="{{ asset('assets/logos/DSA.jpg') }}" width="72" height="72"
@@ -29,7 +30,7 @@
                                         <p class="sappcChOfficialMastheadLine">Barbaza, 5706, Antique, Philippines</p>
                                     </div>
                                     <div class="sappcChOfficialLogo sappcChOfficialLogoRight sappcChOfficialLogoParishSeal">
-                                        <img src="{{ asset('assets/logos/SAPPC.png') }}" width="72" height="72"
+                                        <img src="{{ asset('assets/landingPage/SAPPC-transparent.png') }}" width="72" height="72"
                                             alt="Parish of St. Anthony of Padua, Barbaza"
                                             class="sappcChOfficialLogoImg sappcChOfficialLogoImgParishSeal">
                                     </div>
@@ -62,6 +63,7 @@
                                 </div>
 
                                 <h3 class="sappcPaymentFeeModalFeeHeading">Arancel kang kumpirma</h3>
+                                </div>
 
                                 <div class="table-responsive sappcPaymentFeeModalTableWrap">
                                     <table class="table table-bordered mb-0 sappcPaymentFeeModalTable">

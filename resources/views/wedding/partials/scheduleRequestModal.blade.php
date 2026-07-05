@@ -3,9 +3,6 @@
         <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
             <div class="modal-content sappcScheduleRequestModal">
                 <div class="modal-body">
-                    <button type="button" class="btn-close sappcScheduleRequestModalClose" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-
                     <div class="sappcScheduleRequestLayout">
                         <section class="sappcScheduleCalendarCard" aria-label="Calendar">
                             <div class="sappcScheduleCalendarHead sappcScheduleCalendarHead--interactive">
@@ -32,8 +29,10 @@
                         </section>
 
                         <section class="sappcScheduleFormCard">
-                            <header class="sappcScheduleFormHeader">
-                                <img src="{{ asset('assets/logos/SAPPC.png') }}" alt="Parish logo"
+                            <header class="sappcScheduleFormHeader sappcModalHeaderPanel sappcModalHeaderPanel--centered">
+                                <button type="button" class="btn-close sappcScheduleRequestModalClose" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                                <img src="{{ asset('assets/landingPage/SAPPC-transparent.png') }}" alt="Parish logo"
                                     class="sappcScheduleFormLogo">
                                 <h2 id="weddingScheduleRequestModalTitle">Wedding Schedule Request Form</h2>
                             </header>
@@ -47,6 +46,7 @@
                                 @csrf
                                 <div class="sappcScheduleFormField">
                                     <input type="hidden" name="wedding_id" id="wdScheduleWeddingId" value="">
+                                    <input type="hidden" name="sex" id="wdScheduleSex" value="">
                                     <label for="wdScheduleRefCode">Reference Code:</label>
                                     <input type="text" name="reference_code" id="wdScheduleRefCode"
                                         value="{{ $generatedReferenceCode ?? '' }}"
@@ -66,32 +66,30 @@
                                     <input type="text" name="address" id="wdScheduleAddress" value="">
                                 </div>
                                 <div class="sappcScheduleFormField">
-                                    <label for="wdScheduleSex">Sex:</label>
-                                    <select name="sex" id="wdScheduleSex" class="form-select">
-                                        <option value="">Select Sex</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                    </select>
-                                </div>
-                                <div class="sappcScheduleFormField">
-                                    <label for="wdScheduleDate">Date:</label>
-                                    <input type="date" name="schedule_date" id="wdScheduleDate" required
-                                        class="sappcScheduleNativeInput">
+                                    <label for="wdScheduleDate">Day / Date:</label>
+                                    <div class="sappcScheduleInputIconWrap">
+                                        <input type="date" name="schedule_date" id="wdScheduleDate" required
+                                            class="sappcScheduleNativeInput">
+                                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                                    </div>
                                 </div>
                                 <div class="sappcScheduleFormField">
                                     <label for="wdScheduleTime24">Time:</label>
-                                    <input type="time" name="schedule_time" id="wdScheduleTime24" required
-                                        step="60" class="sappcScheduleNativeInput">
+                                    <div class="sappcScheduleInputIconWrap">
+                                        <input type="time" name="schedule_time" id="wdScheduleTime24" required
+                                            step="60" class="sappcScheduleNativeInput" value="10:00">
+                                        <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                                    </div>
                                 </div>
                             </form>
 
                             <hr class="sappcScheduleFormDivider" aria-hidden="true">
 
                             <div class="sappcScheduleFormActions">
-                                <button type="button" class="sappcScheduleActionBtn is-cancel"
-                                    data-bs-dismiss="modal">Cancel</button>
                                 <button type="submit" form="weddingScheduleRequestForm"
                                     class="sappcScheduleActionBtn is-reserve">Reserved Schedule</button>
+                                <button type="button" class="sappcScheduleActionBtn is-cancel"
+                                    data-bs-dismiss="modal">Cancel</button>
                             </div>
                         </section>
                     </div>

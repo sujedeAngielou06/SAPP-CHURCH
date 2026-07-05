@@ -34,7 +34,7 @@
                     @csrf
                     <input type="hidden" name="wedding_id" id="wdMarriageAppWeddingId" value="">
 
-                    <header class="sappcKasalAppHeader">
+                    <header class="sappcKasalAppHeader sappcModalHeaderPanel sappcModalHeaderPanel--letterhead">
                         <div class="sappcKasalAppLogo">
                             <img src="{{ asset('assets/logos/DSA.jpg') }}" width="88" height="88" alt=""
                                 class="sappcKasalAppLogoImg">
@@ -47,7 +47,7 @@
                             <h1 class="sappcKasalAppTitle">APLIKASYON SA KASAL</h1>
                         </div>
                         <div class="sappcKasalAppLogo">
-                            <img src="{{ asset('assets/logos/SAPPC.png') }}" width="88" height="88" alt=""
+                            <img src="{{ asset('assets/landingPage/SAPPC-transparent.png') }}" width="88" height="88" alt=""
                                 class="sappcKasalAppLogoImg sappcKasalAppLogoImgParish">
                         </div>
                     </header>
