@@ -15,7 +15,25 @@
 @endpush
 
 @section('content')
-    @include('layouts.landingPageHeader')
+    <header class="admin-login-header">
+        <div class="admin-login-header__inner">
+            <a href="{{ route('admin.login') }}" class="admin-login-header__brand">
+                <img
+                    class="admin-login-header__logo"
+                    src="{{ asset('assets/landingPage/SAPPC.png') }}"
+                    alt=""
+                    width="40"
+                    height="40"
+                    decoding="async"
+                >
+                <span>Saint Anthony of Padua Parish Church</span>
+            </a>
+            <a href="{{ route('developers') }}" class="admin-login-header__developers">
+                <i class="fa-solid fa-laptop-code" aria-hidden="true"></i>
+                Developers
+            </a>
+        </div>
+    </header>
 
     <main class="admin-login-root">
         <div class="admin-login-bg" aria-hidden="true"></div>
