@@ -53,15 +53,10 @@
             </header>
 
             <main class="sappc-content">
-                <header class="sappc-dashboard-head">
-                    <h1 class="sappc-page-title sappc-page-title--dashboard">
-                        <i class="fa-solid fa-table-cells-large" aria-hidden="true"></i>
-                        <span class="sappc-page-title__stack">
-                            <span class="sappc-page-title__line">Dashboard</span>
-                            <span class="sappc-page-title__subtitle">Saint Anthony of Padua Parish Church Recording Management System</span>
-                        </span>
-                    </h1>
-                </header>
+                <h1 class="sappc-page-title">
+                    <i class="fa-solid fa-table-cells-large" aria-hidden="true"></i>
+                    DASHBOARD
+                </h1>
 
                 <div id="sappcDocStatsRoot" class="row g-3 sappc-doc-stats"
                     data-monthly-url="{{ route('admin.dashboard.stats.monthly') }}"
@@ -69,45 +64,53 @@
                     <div class="col-sm-6 col-xl-3">
                         <button type="button" class="sappc-doc-stat sappc-doc-stat_clickable w-100 h-100"
                             data-doc-type="christening" aria-haspopup="dialog" aria-controls="sappcStatMonthlyModal">
-                            <div class="sappc-doc-stat_icon" aria-hidden="true"><i class="fa-solid fa-file-lines"></i></div>
-                            <div class="sappc-doc-stat_meta">
-                                <p class="sappc-doc-stat_label">Christening</p>
+                            <p class="sappc-doc-stat_label">Christening <span class="sappc-doc-stat_pipe">|</span> Year
+                                <span class="sappc-doc-stat_year">({{ $statsYear }})</span></p>
+                            <div class="sappc-doc-stat_body">
+                                <div class="sappc-doc-stat_icon" aria-hidden="true"><i
+                                        class="fa-solid fa-file-lines"></i></div>
                                 <p class="sappc-doc-stat_value">{{ $stats['christening'] ?? 0 }}</p>
                             </div>
-                            <span class="visually-hidden">Open {{ $statsYear }} monthly breakdown</span>
+                            <span class="visually-hidden">Open monthly breakdown</span>
                         </button>
                     </div>
                     <div class="col-sm-6 col-xl-3">
                         <button type="button" class="sappc-doc-stat sappc-doc-stat_clickable w-100 h-100"
                             data-doc-type="confirmation" aria-haspopup="dialog" aria-controls="sappcStatMonthlyModal">
-                            <div class="sappc-doc-stat_icon" aria-hidden="true"><i class="fa-solid fa-file-lines"></i></div>
-                            <div class="sappc-doc-stat_meta">
-                                <p class="sappc-doc-stat_label">Confirmation</p>
+                            <p class="sappc-doc-stat_label">Confirmation <span class="sappc-doc-stat_pipe">|</span> Year
+                                <span class="sappc-doc-stat_year">({{ $statsYear }})</span></p>
+                            <div class="sappc-doc-stat_body">
+                                <div class="sappc-doc-stat_icon" aria-hidden="true"><i
+                                        class="fa-solid fa-file-lines"></i></div>
                                 <p class="sappc-doc-stat_value">{{ $stats['confirmation'] ?? 0 }}</p>
                             </div>
-                            <span class="visually-hidden">Open {{ $statsYear }} monthly breakdown</span>
+                            <span class="visually-hidden">Open monthly breakdown</span>
                         </button>
                     </div>
                     <div class="col-sm-6 col-xl-3">
                         <button type="button" class="sappc-doc-stat sappc-doc-stat_clickable w-100 h-100"
                             data-doc-type="wedding" aria-haspopup="dialog" aria-controls="sappcStatMonthlyModal">
-                            <div class="sappc-doc-stat_icon" aria-hidden="true"><i class="fa-solid fa-file-lines"></i></div>
-                            <div class="sappc-doc-stat_meta">
-                                <p class="sappc-doc-stat_label">Wedding</p>
+                            <p class="sappc-doc-stat_label">Wedding <span class="sappc-doc-stat_pipe">|</span> Year
+                                <span class="sappc-doc-stat_year">({{ $statsYear }})</span></p>
+                            <div class="sappc-doc-stat_body">
+                                <div class="sappc-doc-stat_icon" aria-hidden="true"><i
+                                        class="fa-solid fa-file-lines"></i></div>
                                 <p class="sappc-doc-stat_value">{{ $stats['wedding'] ?? 0 }}</p>
                             </div>
-                            <span class="visually-hidden">Open {{ $statsYear }} monthly breakdown</span>
+                            <span class="visually-hidden">Open monthly breakdown</span>
                         </button>
                     </div>
                     <div class="col-sm-6 col-xl-3">
                         <button type="button" class="sappc-doc-stat sappc-doc-stat_clickable w-100 h-100"
                             data-doc-type="burial" aria-haspopup="dialog" aria-controls="sappcStatMonthlyModal">
-                            <div class="sappc-doc-stat_icon" aria-hidden="true"><i class="fa-solid fa-file-lines"></i></div>
-                            <div class="sappc-doc-stat_meta">
-                                <p class="sappc-doc-stat_label">Burial</p>
+                            <p class="sappc-doc-stat_label">Burial <span class="sappc-doc-stat_pipe">|</span> Year
+                                <span class="sappc-doc-stat_year">({{ $statsYear }})</span></p>
+                            <div class="sappc-doc-stat_body">
+                                <div class="sappc-doc-stat_icon" aria-hidden="true"><i
+                                        class="fa-solid fa-file-lines"></i></div>
                                 <p class="sappc-doc-stat_value">{{ $stats['burial'] ?? 0 }}</p>
                             </div>
-                            <span class="visually-hidden">Open {{ $statsYear }} monthly breakdown</span>
+                            <span class="visually-hidden">Open monthly breakdown</span>
                         </button>
                     </div>
                 </div>

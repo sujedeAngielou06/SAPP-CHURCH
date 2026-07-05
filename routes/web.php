@@ -76,12 +76,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/document', [DocumentationController::class, 'document'])->name('admin.document');
     Route::get('/document/report-window', [DocumentationController::class, 'reportWindow'])->name('admin.document.report-window');
     Route::get('/document/application-form-report', [DocumentationController::class, 'applicationFormReport'])->name('admin.document.application-form-report');
-    Route::get('/document/application-form-report-pdf', [DocumentationController::class, 'applicationFormReportPdf'])->name('admin.document.application-form-report-pdf');
     Route::get('/document/burial-report', [DocumentationController::class, 'burialReport'])->name('admin.document.burial-report');
     Route::get('/certification', [ChristeningController::class, 'certificationPage'])->name('admin.certification');
     Route::get('/certification/report-window', [ChristeningController::class, 'certificationReportWindow'])->name('admin.certification.report-window');
     Route::get('/certification/records', [ChristeningController::class, 'certificationRecords'])->name('admin.certification.records');
-    Route::get('/certification/report-pdf', [ChristeningController::class, 'certificationReportPdf'])->name('admin.certification.report-pdf');
     Route::get('/christening/next-reference-code', [ChristeningController::class, 'nextChristeningReferenceCode'])->name('admin.christening.next-reference-code');
     Route::get('/confirmation/next-reference-code', [ConfirmationController::class, 'nextConfirmationReferenceCode'])->name('admin.confirmation.next-reference-code');
     Route::get('/wedding/next-reference-code', [WeddingController::class, 'nextWeddingReferenceCode'])->name('admin.wedding.next-reference-code');

@@ -8,7 +8,6 @@
     @include('layouts.cdn')
     <link rel="stylesheet" href="{{ asset('css/document/sappcDocumentLayout.css') }}">
     @stack('styles')
-    <link rel="stylesheet" href="{{ asset('css/partials/sappcModalHeaders.css') }}?v={{ filemtime(public_path('css/partials/sappcModalHeaders.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/app-typography.css') }}?v={{ filemtime(public_path('css/app-typography.css')) }}">
 </head>
 <body class="sappc-doc-report-window">

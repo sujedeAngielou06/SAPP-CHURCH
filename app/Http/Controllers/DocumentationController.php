@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Support\ClientNameDisplay;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\Response;
 
 class DocumentationController extends Controller
 {
@@ -60,33 +58,6 @@ class DocumentationController extends Controller
             'service_heading' => $data['service_heading'],
             'rows' => $data['rows'],
         ]);
-    }
-
-    public function applicationFormReportPdf(Request $request): Response
-    {
-        $validated = $request->validate([
-            'month' => ['nullable', 'string'],
-            'service_type' => ['required', 'string', 'in:christening,burial,confirmation,wedding'],
-        ]);
-
-        $data = $this->buildApplicationFormReportData(
-            $this->resolveMonthString($validated['month'] ?? null),
-            (string) $validated['service_type']
-        );
-
-        $filename = $this->buildReportPdfFilename(
-            (string) $data['service_type'],
-            (string) $data['report_label'],
-            'report'
-        );
-
-        $pdf = Pdf::loadView('pdf.document-report', $data)->setPaper('a4', 'portrait');
-
-        if ($request->boolean('inline')) {
-            return $pdf->stream($filename);
-        }
-
-        return $pdf->download($filename);
     }
 
     /**
@@ -189,12 +160,5 @@ class DocumentationController extends Controller
         } catch (\Throwable) {
             return now()->format('Y-m');
         }
-    }
-
-    private function buildReportPdfFilename(string $serviceType, string $reportLabel, string $suffix): string
-    {
-        $slug = strtolower(trim(preg_replace('/[^a-z0-9]+/i', '-', $reportLabel) ?? '', '-'));
-
-        return strtolower($serviceType).'-'.$suffix.($slug !== '' ? '-'.$slug : '').'.pdf';
     }
 }

@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="sappc-doc-sheet sappc-doc-report-window_sheet" style="display:block;">
-        <div class="sappc-doc-sheet__actions no-print sappc-doc-report-window_toolbar sappcModalHeaderPanel" role="toolbar">
+        <div class="sappc-doc-sheet__actions no-print sappc-doc-report-window_toolbar" role="toolbar">
             <button type="button" class="sappc-doc-picker_btn sappc-doc-toolbar_print" onclick="window.print()">
                 <i class="fa-solid fa-print" aria-hidden="true"></i>
                 Print Report

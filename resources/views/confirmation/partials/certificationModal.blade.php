@@ -3,15 +3,20 @@
             aria-labelledby="confirmationCertificationModalTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered sappcCertModalDialog">
                 <div class="modal-content sappcCertModalSurface">
+                    <div class="modal-header flex-wrap gap-2 border-bottom-0 pb-0 align-items-center">
+                        <h2 class="modal-title h6 mb-0 fw-normal visually-hidden"
+                            id="confirmationCertificationModalTitle">Confirmation certification form</h2>
+                        <div class="d-flex flex-wrap gap-2 align-items-center ms-auto">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                    </div>
                     <div class="modal-body pt-0">
                         <form class="sappcCertModalForm" id="confirmationCertificationForm" action="#" method="post"
                             autocomplete="off" data-default-reference-code="{{ $generatedReferenceCode ?? '' }}">
-                            <div class="sappcCertModalMasthead sappcModalHeaderPanel sappcModalHeaderPanel--centered">
-                                <h2 class="visually-hidden" id="confirmationCertificationModalTitle">Confirmation certification form</h2>
-                                <button type="button" class="btn-close sappcCertModalClose" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                            <div class="sappcCertModalMasthead">
                                 <div class="sappcCertModalLogoWrap">
-                                    <img src="{{ asset('assets/landingPage/SAPPC-transparent.png') }}" width="72" height="72"
+                                    <img src="{{ asset('assets/logos/SAPPC.png') }}" width="72" height="72"
                                         alt="Parish of St. Anthony of Padua, Barbaza"
                                         class="sappcCertModalLogoImg">
                                 </div>

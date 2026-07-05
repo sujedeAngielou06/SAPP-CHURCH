@@ -1,11 +1,9 @@
 @php
     $applicationReportUrl = $applicationReportUrl ?? route('admin.document.application-form-report');
-    $applicationReportPdfUrl = $applicationReportPdfUrl ?? route('admin.document.application-form-report-pdf');
 @endphp
 <script>
     (function ($) {
         var url = @json($applicationReportUrl);
-        var pdfUrl = @json($applicationReportPdfUrl);
         var $root = $('#sappcDocPageRoot');
         var $picker = $('#sappcDocPickerWrap');
         var $sheet = $('#sappcDocumentSheet');
@@ -237,41 +235,30 @@
         });
 
         $('#sappcDocPrintBtn').on('click', function () {
-            var typeVal = ($type.val() || '').toString().trim();
-            var monthVal = ($monthToolbar.val() || $monthPicker.val() || '').toString().trim();
-            if (!typeVal || !monthVal) {
-                window.alert('Select a report type and month first.');
-                return;
-            }
-            var previewUrl =
-                pdfUrl +
-                '?inline=1&month=' +
-                encodeURIComponent(monthVal) +
-                '&service_type=' +
-                encodeURIComponent(typeVal);
-            window.open(previewUrl, '_blank');
+            window.print();
         });
+
+        (function () {
+            var savedPrintTitle = '';
+
+            window.addEventListener('beforeprint', function () {
+                savedPrintTitle = document.title;
+                document.title = ' ';
+            });
+
+            window.addEventListener('afterprint', function () {
+                if (savedPrintTitle !== '') {
+                    document.title = savedPrintTitle;
+                    savedPrintTitle = '';
+                }
+            });
+        })();
 
         $(document).on('click', '[data-doc-export]', function () {
             var fmt = $(this).attr('data-doc-export') || '';
             fmt = fmt.toLowerCase();
-            if (fmt === 'pdf') {
-                var typeVal = ($type.val() || '').toString().trim();
-                var monthVal = ($monthToolbar.val() || $monthPicker.val() || '').toString().trim();
-                if (!typeVal || !monthVal) {
-                    window.alert('Select a report type and month first.');
-                    return;
-                }
-                window.location.href =
-                    pdfUrl +
-                    '?month=' +
-                    encodeURIComponent(monthVal) +
-                    '&service_type=' +
-                    encodeURIComponent(typeVal);
-                return;
-            }
-            if (fmt === 'docx' || fmt === 'xlsx') {
-                window.alert('Download ' + fmt.toUpperCase() + ' is not wired yet. Use PDF or Print Report.');
+            if (fmt === 'pdf' || fmt === 'docx' || fmt === 'xlsx') {
+                window.alert('Download ' + fmt.toUpperCase() + ' is not wired yet. Use Print Report for a paper copy.');
             }
         });
     })(jQuery);

@@ -24,7 +24,7 @@
             </div>
             <div class="sappc-registry-page_actions">
                 <button type="button"
-                    class="sappc-registry-toolbar_btn sappc-registry-toolbar_btn--app"
+                    class="sappc-registry-toolbar_btn sappc-registry-toolbar_btn--cta"
                     id="christeningApplicationFormBtn"
                     aria-expanded="false"
                     aria-controls="christeningApplicationFormModal"
