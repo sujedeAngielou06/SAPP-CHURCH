@@ -686,21 +686,17 @@ body.sappc-dash--dashboard .sappc-page-title--dashboard .sappc-page-title__subti
 }
 
 .sappc-registry-toolbar_btn--app {
-    position: relative;
     justify-content: center;
-    min-width: 11.5rem;
-    padding-left: 2.35rem;
-    padding-right: 2.35rem;
+    min-width: 10.4rem;
+    gap: 0.4rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     background: var(--sappc-action-green);
     border-color: var(--sappc-action-green-border);
     color: #fff;
 }
 
 .sappc-registry-toolbar_btn--app > i {
-    position: absolute;
-    left: 0.85rem;
-    top: 50%;
-    transform: translateY(-50%);
     font-size: 0.9rem;
 }
 
