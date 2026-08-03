@@ -537,13 +537,13 @@
                     updateConfirmationGodparentToolbarBtns();
                     return;
                 }
-                confirmationGodparentRowCount += 1;
-                var g = confirmationGodparentRowCount;
                 var $colA = $('#cnAppGpColA');
                 var $colB = $('#cnAppGpColB');
                 if (!$colA.length || !$colB.length) {
                     return;
                 }
+                confirmationGodparentRowCount += 1;
+                var g = confirmationGodparentRowCount;
                 $('<input/>', {
                     type: 'text',
                     class: 'sappcCnAppIn',
@@ -575,6 +575,11 @@
             }
 
             function ensureConfirmationGodparentRows(minRows) {
+                var $colA = $('#cnAppGpColA');
+                var $colB = $('#cnAppGpColB');
+                if (!$colA.length || !$colB.length) {
+                    return;
+                }
                 var max = confirmationGodparentMaxRows;
                 var target = Math.max(1, Math.min(max, parseInt(minRows, 10) || 1));
                 while (confirmationGodparentRowCount < target) {
@@ -583,7 +588,14 @@
             }
 
             function resetConfirmationGodparentRows() {
-                $('#cnAppGpColA, #cnAppGpColB').empty();
+                var $colA = $('#cnAppGpColA');
+                var $colB = $('#cnAppGpColB');
+                if (!$colA.length || !$colB.length) {
+                    confirmationGodparentRowCount = 0;
+                    return;
+                }
+                $colA.empty();
+                $colB.empty();
                 confirmationGodparentRowCount = 0;
                 ensureConfirmationGodparentRows(confirmationGodparentInitialRows);
             }
@@ -625,6 +637,9 @@
             }
 
             function initConfirmationApplicationGodparentGrid() {
+                if (!$('#cnAppGpColA').length || !$('#cnAppGpColB').length) {
+                    return;
+                }
                 resetConfirmationGodparentRows();
             }
 
@@ -928,11 +943,26 @@
 
             var cnApplicationDraftsByConfirmationId = {};
 
+            function mergeConfirmationPaymentDataFromApplicationDraft(cid, data) {
+                if (!data || typeof data !== 'object') {
+                    return data;
+                }
+                var appSnap = cnApplicationDraftsByConfirmationId[String(cid)];
+                if (!appSnap || typeof window.sappcRegistryTopFromConfirmationApplicationSnap !== 'function') {
+                    return data;
+                }
+                return window.sappcMergeRegistryTopEmpty(
+                    data,
+                    window.sappcRegistryTopFromConfirmationApplicationSnap(appSnap)
+                );
+            }
+
             var $paymentModal = $('#confirmationPaymentFeeModal');
             var $paymentBtn = $('#confirmationPaymentFeeBtn');
             var $paymentFeeForm = $('#confirmationPaymentFeeForm');
             var $feeItemsBody = $('#confirmationPaymentFeeItemsBody');
             var $addFeeBtn = $('#confirmationPaymentFeeAddItemBtn');
+            var openConfirmationPaymentModal = null;
 
             function renumberConfirmationFeeRows() {
                 $feeItemsBody.find('[data-fee-row]').each(function(i) {
@@ -1138,21 +1168,15 @@
             if ($paymentModal.length && $paymentBtn.length && typeof bootstrap !== 'undefined') {
                 var paymentBsModal = bootstrap.Modal.getOrCreateInstance($paymentModal[0]);
 
-                $paymentModal.on('shown.bs.modal', function() {
-                    $paymentBtn.attr('aria-expanded', 'true');
-                    applyConfirmationRegistryTopFieldsFromSelectedRow();
-                    syncAllConfirmationPaymentFeeRowBadgeColors();
-                });
-                $paymentModal.on('hidden.bs.modal', function() {
-                    $paymentBtn.attr('aria-expanded', 'false');
-                });
+                function showConfirmationPaymentModalInstance() {
+                    paymentBsModal.show();
+                }
 
-                $paymentBtn.on('click', function(e) {
-                    e.preventDefault();
-                    var cid = getSelectedConfirmationId();
+                function openConfirmationPaymentModalImpl(recordId) {
+                    var cid = String(recordId == null ? '' : recordId).trim();
                     if (!cid) {
                         resetConfirmationPaymentFormForNewEntry();
-                        paymentBsModal.show();
+                        showConfirmationPaymentModalInstance();
                         return;
                     }
                     if (!paymentDetailsUrl) {
@@ -1167,29 +1191,51 @@
                         if (!ok) {
                             return;
                         }
-                    fetchJson(buildQueryUrl(paymentDetailsUrl, {
-                        confirmation_id: cid
-                    }), jsonHeaders)
-                        .done(function(res) {
-                            if (res && res.ok && res.data) {
-                                applyConfirmationPaymentFeeFormObject(
-                                    mergeConfirmationPaymentDataFromApplicationDraft(cid, res.data)
-                                );
-                                applyConfirmationRegistryTopFieldsFromSelectedRow();
-                                paymentBsModal.show();
-                            }
-                        })
-                        .fail(function(xhr) {
-                            var msg = 'Could not load payment details.';
-                            var data = xhr && xhr.responseJSON ? xhr.responseJSON : null;
-                            if (data && data.message) msg = data.message;
-                            sappcCnSwal({
-                                icon: 'error',
-                                title: 'Error',
-                                text: msg,
+                        fetchJson(buildQueryUrl(paymentDetailsUrl, {
+                            confirmation_id: cid
+                        }), jsonHeaders)
+                            .done(function(res) {
+                                if (res && res.ok && res.data) {
+                                    applyConfirmationPaymentFeeFormObject(
+                                        mergeConfirmationPaymentDataFromApplicationDraft(cid, res.data)
+                                    );
+                                    applyConfirmationRegistryTopFieldsFromSelectedRow();
+                                    showConfirmationPaymentModalInstance();
+                                }
+                            })
+                            .fail(function(xhr) {
+                                var msg = 'Could not load payment details.';
+                                var data = xhr && xhr.responseJSON ? xhr.responseJSON : null;
+                                if (data && data.message) {
+                                    msg = data.message;
+                                }
+                                sappcCnSwal({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: msg,
+                                });
                             });
-                        });
                     });
+                }
+
+                openConfirmationPaymentModal = openConfirmationPaymentModalImpl;
+
+                $paymentModal.on('shown.bs.modal', function() {
+                    $paymentBtn.attr('aria-expanded', 'true');
+                    applyConfirmationRegistryTopFieldsFromSelectedRow();
+                    syncAllConfirmationPaymentFeeRowBadgeColors();
+                });
+                $paymentModal.on('hidden.bs.modal', function() {
+                    $paymentBtn.attr('aria-expanded', 'false');
+                });
+
+                $paymentBtn.on('click', function(e) {
+                    e.preventDefault();
+                    if (($paymentBtn.attr('data-open-mode') || '').trim() === 'new') {
+                        openConfirmationPaymentModal('');
+                        return;
+                    }
+                    openConfirmationPaymentModal(getSelectedConfirmationId());
                 });
 
                 $paymentFeeForm.on('submit', function(e) {
@@ -1284,7 +1330,9 @@
                         if (!ok) {
                             return;
                         }
-                        if ($('#confirmationPaymentFeeBtn').length) {
+                        if (typeof openConfirmationPaymentModal === 'function') {
+                            openConfirmationPaymentModal(id);
+                        } else if ($('#confirmationPaymentFeeBtn').length) {
                             $('#confirmationPaymentFeeBtn').trigger('click');
                         }
                     });
@@ -1517,20 +1565,6 @@
                         }
                     });
                     updateConfirmationArancelTotal();
-                }
-
-                function mergeConfirmationPaymentDataFromApplicationDraft(cid, data) {
-                    if (!data || typeof data !== 'object') {
-                        return data;
-                    }
-                    var appSnap = cnApplicationDraftsByConfirmationId[String(cid)];
-                    if (!appSnap || typeof window.sappcRegistryTopFromConfirmationApplicationSnap !== 'function') {
-                        return data;
-                    }
-                    return window.sappcMergeRegistryTopEmpty(
-                        data,
-                        window.sappcRegistryTopFromConfirmationApplicationSnap(appSnap)
-                    );
                 }
 
                 function overlayConfirmationScheduleTopFromApplicationDraft(cid) {

@@ -55,6 +55,8 @@
         </div>
     </div>
 
+    @stack('modals')
+
     <script src="{{ asset('js/adminSidebar.js') }}"></script>
     @include('partials.registry.clientNameFormatScript')
     @stack('scripts')

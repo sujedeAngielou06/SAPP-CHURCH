@@ -518,9 +518,9 @@ body.sappc-dash--locked-viewport.modal-open {
 }
 
 body.sappc-dash--dashboard .sappc-dashboard-head {
-    margin: -1.25rem -1.25rem 1.25rem;
-    padding: 0.75rem 1.25rem 0.85rem;
-    background: #bdbdbd;
+    margin: 0 0 1.25rem;
+    padding: 0;
+    background: transparent;
 }
 
 body.sappc-dash--dashboard .sappc-page-title--dashboard {
@@ -1636,7 +1636,7 @@ body.sappc-dash--registry-embed .sappc-registry-page {
     padding: 0;
 }
 
-body.sappc-dash--registry-embed .sappc-registry-page > *:not(#christeningApplicationFormModal):not(#confirmationApplicationModal):not(#weddingMarriageApplicationModal):not(#burialApplicationFormModal) {
+body.sappc-dash--registry-embed .sappc-registry-page > *:not(#christeningApplicationFormModal):not(#confirmationApplicationModal):not(#confirmationPaymentFeeModal):not(#weddingMarriageApplicationModal):not(#burialApplicationFormModal) {
     display: none !important;
 }
 

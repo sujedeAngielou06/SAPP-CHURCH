@@ -27,6 +27,7 @@
                 <button type="button"
                     class="sappc-registry-toolbar_btn sappc-registry-toolbar_btn--cta"
                     id="confirmationPaymentFeeBtn"
+                    data-open-mode="new"
                     title="Payment fee"
                     aria-label="Open payment fee"
                     aria-expanded="false"
@@ -43,8 +44,6 @@
             'showCertification' => true,
         ])
 
-        @include('confirmation.partials.paymentFeeModal')
-
         @include('confirmation.partials.recordsTablePanel', [
             'activeSection' => 'payment',
             'sectionLabel' => 'payment records',
@@ -54,6 +53,13 @@
         ])
     </div>
 @endsection
+
+@push('modals')
+    @include('confirmation.partials.paymentFeeModal', [
+        'generatedReferenceCode' => $generatedReferenceCode ?? '',
+        'defaultPaymentFeeRows' => $defaultPaymentFeeRows ?? [],
+    ])
+@endpush
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
